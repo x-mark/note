@@ -11,7 +11,7 @@ Proxy_1启动参数:
 proxy http --always -t tcp  -p :80 -T kcp -P [Proxy_2_IPAddr:Port]
 #--always: 不进行DNS解析，全部转发.(GoProxy默认会进行DNS解析，如果主机可达就不再转发)
 #-t: user到Proxy1的连接类型
-#-p: proxy_1的监听端口，应为代理http所以是80
+#-p: proxy_1的监听端口，因为代理所有http所以是80
 #-T: 和上级代理连接方式，这里选KCP
 #-P: 上级代理地址:端口
 ``` 
