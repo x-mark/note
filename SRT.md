@@ -24,7 +24,7 @@
 ## receive/sent process
 任务：
 1. 处理读取事件，接收来自io的packet。
-2. 维护IOInterface 和 connection 是多对多的映射关系
+2. 维护connection和IOInterface是的映射关系，IOInterface可复用
 3. 解出packet的connection id投递到对应的指定connection的消息队列
 4. 将cinnection的packet通过IOInterface发出，后期加入路由选择和负载均衡处理
 key point:
