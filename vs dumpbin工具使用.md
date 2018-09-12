@@ -12,4 +12,4 @@ dumpbin /exports xxx.dll //查看dll导出表 常用于解决LINK 200 无法找�
 
 
 ## 扩展
-基于dumpbin可以实现一个类似dependency程序依赖分析工具，来检测依赖树，以及32/64库错乱问题
+基于dumpbin可以实现一个类似dependency的程序依赖分析工具，来检测依赖树，以及32/64库错乱问题

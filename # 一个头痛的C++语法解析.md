@@ -26,3 +26,11 @@ std::thread my_thread(background_task());
 std::thread my_thread((background_task()));  // 1
 std::thread my_thread{background_task()};    // 2
 ```
+
+
+## operator
+Qt的QUuid中看到有这样一个转换重载
+```C++
+//转换运行符重载
+operator GUID(QUuid);
+```
