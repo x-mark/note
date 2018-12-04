@@ -1,5 +1,7 @@
 # SRT
 
+基于QUIC协议的一个改进的实现
+
 ## 零散杂记（候选特性）
 
 + 可以使用protobuffer Varint编码方式压缩消息头体积
@@ -11,9 +13,9 @@
 
 ```ditaa{ args=["-E"] code_block=true cmd=false}
 +-------------+
-|  Stream     |
-+-------------+
 |  Session    |
++-------------+
+|  Streams    |
 +-------------+
 | Connection  |
 +-------------+
@@ -21,28 +23,82 @@
 +-------------+
 ```
 
-io_interface : sockket接口的封装，使用boost::asio::udp::socket。数据收发接口  
+io_interface : socket接口的封装，使用boost::asio::udp::socket。数据收发接口  
 connection : 连接抽象，实现可靠连接。拥塞控制(GC)、流量控制(基于窗口)、Pacing发送、NACK、Retransmission  
-Session : 回话管理，管理connection的多路复用（一个connection多个stream/多个connection）
-Stream : 应用程序读写接口
+Stream : 轻量级的读写流，相互之间不会阻塞 可以理解为一种弹性的“消息”
+Session :app交互接口，可以在此实现多connection聚合
+
+## Packet类型
+
+### long header packet
+
+```ditaa{ args=["-E"] code_block=true cmd=false}
++----------+------------+-----------------------+-----------------------+--------------------+-------------+-------+
+|1|type(7b)|Version(32b)|DstConnectionID(Varint)|SrcConnectionID(Varint)|PacketNumber(Varint)|Protected Payload (*)|
++----------+------------+-----------------------+-----------------------+--------------------+-------------+-------+
+```
+
+#### Init
+
+#### HandShake
+
+HandShake只能包含CRYPTO，ACK，PADDING，CONNECTION_CLOSE Frame，其他的Frame端点都视为Connection Error
+
+#### Retry
+
+### short header packet
+
+```ditaa{ args=["-E"] code_block=true cmd=false}
++-------+-----------------------+--------------------+---------------------+
+|1|R(7b)|DstConnectionID(Varint)|PacketNumber(Varint)|Protected Payload (*)|
++-------+-----------------------+--------------------+---------------------+
+```
+
+#### 帧类型
+
+|类型|名称|
+|---|---|
+|0x00|PADDING|
+|0x01|PING|
+|0x02~0x03|ACK|
+|0x04|RESET|
+|0x05|STOP_SENDING|
+|0x06|CRYPTO|
+|0x07|NEW_TOKEN|
+|0x08~0x0F|PAYLOAD|
+|0x10|MAX_DATA|
+|0x14|DATA_BLOCKED|
+|0x18|NEW_CONNECTION_ID|
+|0x19|RETIRE_CONNECTION_ID|
+|0x1A|PATH_CHALLENGE|
+|0x1B|PATH_RESPONSE|
+|0x1C~0x1D|CONNECTION_CLOSE|
 
 ## 通信过程
 
 ```sequence {theme="simple"}
 Note Over Server: listen
-Client->Server: Init Packet(hello)
-Note Over Server:Accept Connection
-Server->Client:HandShake Packet,MAX_DATA
+Client->Server: Hello
+Server-->Client: Retry (token)
+Client-->Server: Hello (token)
+Note Over Server:Accepting Connection
+Server->Client:HandShake
 Note Right Of Client:connected
 
-Client->Server:STREAMS_BLOCKED
-Note Over Server:Accept  stream
-Server->Client:MAX_STREAMS,MAX_STREAM_DATA
-Note Right Of Client:new stream  S1 created
-Client->Server:STREAM
-Server-->Client:STREAM
-Note Right Of Client:send some data ...
-Note Left Of Server: receive some data
+Client->Server:C0:STREAM(data)
+Note Left Of Server:Connected
+Note Over Server:App notify
+Server->Client:S0:STREAM(data) ACK-C0
+Client->Server:C1:ACK-S0
+Server->Client:S1:ACK-C1
+Client->Server:C2:ACK-S1
+Server-->Client:S2:ACK-C2 [Loss]
+Note Left Of Server: End with ack only\nStop retransmit
+Client->Server:C3:ACK-S1
+Server->Client:S3:ACK-C2
+Note Right Of Client:End with ack only\nStop Ack
+
+
 Client->Server:DATA_BLOCKED/STREAM_DATA_BLOCKED
 Note Right Of Client:connection/stream blocked
 Server->Client:MAX_DATA/MAX_STREAM_DATA
@@ -66,13 +122,73 @@ Client-->Server:CONNECTION_CLOSE
 
 ```
 
-### 关闭stream逻辑
+### 握手流程
 
-发送端stream数据（除最后一个STREAM Frame）被确认接收完毕，发送最后一个STREAM frame（如果数据全部确认接收STREAM为空）标记为FIN状态，接收端接收到FIN状态的STREAM，则数据传输完毕，关闭本端stream，当发送端收到携带FIN STREAM frame被确认的ACK后关闭发送端stream。
++ Client向Server发送Init Packet，源connection ID为client connection ID 目标connection ID 为0；携带D-H密钥交换参数。
++ Server Acceptor接收到Init Packet进行源connection ID匹配，如果匹配上则表明这是一个重传的Init Packet 派送给对应的connection处理。没有匹配上则表明是一个新建连接Init Packet，新建一个连接派送处理。
++ 新建connection处理第一个Init Packet，发出handshake响应包，连接建立。
 
-### 关闭connection逻辑
+**这里存在DDos攻击风险，如果收到Init Packet后就新建io_interface可能导致端口耗尽，后期考虑处理，handshake握手成功前是否有必要不申请新的socket，连接建立后再新建socket**
+
+### Ack
+
+即使在接收到的packet之前存在间隙，端点绝不能发送ACK Frame来确认只包含ACK Frame和PADDING Frame的数据包。  
+必须在确认其他分组时确认只包含ACK Frame和PADDING Frame的packet。  
+为了保证接收到需要确认的packet时每个RTT内至少发送一次确认，接收方的延迟确认定时器不应大于min(RTT,kMaxAckDelay) kMaxAckDelay默认取25ms。  
+一旦ACK Frame被对端确认（ACK Tracked）那么它所确认的packet不应再次ACK。  
+为了限制接收器状态或ACK Frame的大小，接收器可以限制发送的ACK block数量（这可能导致不必要的重传）。  
+接收方应该优先重复确认最新接收的数据包而不是之前接收的数据包，尽快触发对端标记packet丢失。
+
+### 重传
+
+#### 基于ACK的重传
+
++ PacketNumber阈值
+跟踪到Send packet被对端确认，在 最大被确认packet_number - 3 之前发送的packet被标记为丢失
+
++ 时间阈值
+跟踪到Send packet被对端确认，在 最大被确认packet_number 之前发送的packet，如果超过时间阈值被标记为丢失。  
+时间阈值 = kTimeThreshold * max(SRTT,last_RTT)  
+系数kTimeThreshold默认取9/8（可调整）减小会增大虚假重传的概率 增大会增加丢失检测延迟
+
+#### 基于超时的重传
+
++ 尾丢失探测（Tail Loss Probe）
+  探测超时（Probe Timeout，PTO） PTO = min(1.5*SRTT+MaxAckDelay, kMinTLPTimeout)  
+  如果RTO小于PTO则 PTO = min(RTO,PTO)  
+  TLP至少为1.5倍的SRTT是（TCP TLP定义），为了保证ACK过期。  
+  为了减少延迟，在RTO定时器之前允许TLP定时器触发两次，当TLP定时器第一次到期，发送TLP分组并重新开始TLP定时器计时，当TLP定时器第二次到期，发送第二次TLP分组并开启RTO定时器计时。  
+  TLP数据包应尽可能发送新的数据，如果没有新数据可用或流控限制则可以重传未确认的数据，从而尽可能缩短恢复时间。  
+  TLP定时器超时发送探测数据包是在确认数据包丢失之前，因此不应将未确认的数据包标记为丢失状态。
+
+
++ 重传超时时间（Retransmission Timeout，RTO）
+  当发送最后一个TLP分组时，RTO定时器启动，如果RTO定时器超时，发送方发送两个packet，以唤醒对端进行ACK，并重新启动RTO定时器  
+  最后一个TLP发送时 RTO = max(SRTT + 4*RTTVAR + MaxAckDelay, kMinRTOTimeout)  
+  每当RTO定时器超时，则RTO翻倍
+
+### 关闭connection流程
 
 发送端数据全部发送完毕，发送CONNECTION_CLOSE主动关闭当前连接，发送后等待Ack
+
+## 安全性
+
+### Packet加密
+
+type 不加密
+
+
+### 放大攻击
+
+避免服务端被放大攻击利用，严格限制对未验证的客户端的响应不会超过客户端请求数据大小。要求连接建立期间，客户端发起的建立连接请求数据包，必须填充到默认数据包最大长度。否则服务器可以不响应。
+
+## 客户端验证
+
+避免伪装客户端大量非法建立连接请求，服务端可基于token对客户端进行验证，客户端发送Init Packet要求建立连接，服务端返回Retry Packet并携带一个token，要求客户端基于一定的规则，对token进行处理后，再次请求连接并携带token（QUIC中是要求token原样返回，这里要求token进行一定规则的处理，如携带token的Hash256签名）
+
+## 地址欺骗
+
+侦测到连接地址迁移（接收到来自其他源地址的高PN编号的packet），必须对迁移地址进行验证，发送PATH_CHALLENGE帧，在接收到正确的PATH_RESPONSE不会向该地址发送新的数据（防止放大攻击），验证失败继续使用原来的源地址。在此期间来自其他地址的更高PN编号的packet将覆盖当前验证地址。
 
 ## Send
 
