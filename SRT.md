@@ -33,28 +33,46 @@ Session :app交互接口，可以在此实现多connection聚合
 ### long header packet
 
 ```ditaa{ args=["-E"] code_block=true cmd=false}
-+----------+------------+-----------------------+-----------------------+--------------------+-------------+-------+
-|1|type(7b)|Version(32b)|DstConnectionID(Varint)|SrcConnectionID(Varint)|PacketNumber(Varint)|Protected Payload (*)|
-+----------+------------+-----------------------+-----------------------+--------------------+-------------+-------+
++-+--------+------+------+--------------------------+--------------------------+-----------+
+|1|Type(7b)|DL(4b)|SL(4b)|DstConnectionID(4~8 Bytes)|SrcConnectionID(4~8 Bytes)|Payload (*)|
++-+--------+------+------+--------------------------+--------------------------+-----------+
 ```
 
-#### Init
+#### Hello
+
+```ditaa{ args=["-E"] code_block=true cmd=false}
++----+------+------+--------------------------+--------------------------+-------------------------+
+|0x80|DL(4b)|SL(4b)|DstConnectionID(4~8 Bytes)|SrcConnectionID(4~8 Bytes)|CRYPTO Frame(*) (PADDING)|
++----+------+------+--------------------------+--------------------------+-------------------------+
+```
+
+#### Retry
+
+```ditaa{ args=["-E"] code_block=true cmd=false}
++----+------+------+--------------------------+--------------------------+-------------------------------------------+
+|0x81|DL(4b)|SL(4b)|DstConnectionID(4~8 Bytes)|SrcConnectionID(4~8 Bytes)| TokenLen(Varint) Token(TokenLen) (PADDING)|
++----+------+------+--------------------------+--------------------------+-------------------------------------------+
+```
 
 #### HandShake
 
-HandShake只能包含CRYPTO，ACK，PADDING，CONNECTION_CLOSE Frame，其他的Frame端点都视为Connection Error
+```ditaa{ args=["-E"] code_block=true cmd=false}
++----+------+------+--------------------------+--------------------------+--------------------------+
+|0x82|DL(4b)|DL(4b)|DstConnectionID(4~8 Bytes)|SrcConnectionID(4~8 Bytes)| CRYPTO Frame(*) (PADDING)|
++----+------+------+--------------------------+--------------------------+--------------------------+
+```
 
-#### Retry
+HandShake只能包含CRYPTO，PADDING，CONNECTION_CLOSE Frame，其他的Frame端点都视为Connection Error
 
 ### short header packet
 
 ```ditaa{ args=["-E"] code_block=true cmd=false}
-+-------+-----------------------+--------------------+---------------------+
-|1|R(7b)|DstConnectionID(Varint)|PacketNumber(Varint)|Protected Payload (*)|
-+-------+-----------------------+--------------------+---------------------+
++-+-----+------+--------------------------+---------------------------+-----------+
+|0|R(3b)|DL(4b)|DstConnectionID(4~8 Bytes)|PacketNumber(Varint max=11)|Payload (*)|
++-+-----+------+--------------------------+---------------------------+-----------+
 ```
 
-#### 帧类型
+### 帧类型
 
 |类型|名称|
 |---|---|
@@ -90,13 +108,19 @@ Note Left Of Server:Connected
 Note Over Server:App notify
 Server->Client:S0:STREAM(data) ACK-C0
 Client->Server:C1:ACK-S0
-Server->Client:S1:ACK-C1
-Client->Server:C2:ACK-S1
-Server-->Client:S2:ACK-C2 [Loss]
-Note Left Of Server: End with ack only\nStop retransmit
-Client->Server:C3:ACK-S1
-Server->Client:S3:ACK-C2
-Note Right Of Client:End with ack only\nStop Ack
+Note Right Of Client:End with ack only
+Note Left Of Server: End with ack only
+Note Left Of Server: If C1 Loss, Tail Loss Probe
+Server-->Client:S1:STREAM(data) ACK-C0 [TLP]
+Client-->Server:C2:ACK-S1-S0
+Note Left Of Server: C2 Loss
+Server-->Client:S2:STREAM(data) ACK-C0 [TLP]
+Client-->Server:C3:ACK-S2-S0
+Note Left Of Server:C3 Loss, twice TLP fail,\n RTO Send dual packets
+Server-->Client:S3:STREAM(data) ACK-C0 [RTO]
+Server-->Client:S4:STREAM(data) ACK-C0 [RTO]
+Client-->Server:C4:ACK-S4-S0
+Note Left Of Server: If C4 Loss, RTO Double
 
 
 Client->Server:DATA_BLOCKED/STREAM_DATA_BLOCKED
@@ -124,11 +148,9 @@ Client-->Server:CONNECTION_CLOSE
 
 ### 握手流程
 
-+ Client向Server发送Init Packet，源connection ID为client connection ID 目标connection ID 为0；携带D-H密钥交换参数。
++ Client向Server发送Hello Packet，源connection ID为client connection ID 目标connection ID 为0；携带D-H密钥交换参数。
 + Server Acceptor接收到Init Packet进行源connection ID匹配，如果匹配上则表明这是一个重传的Init Packet 派送给对应的connection处理。没有匹配上则表明是一个新建连接Init Packet，新建一个连接派送处理。
 + 新建connection处理第一个Init Packet，发出handshake响应包，连接建立。
-
-**这里存在DDos攻击风险，如果收到Init Packet后就新建io_interface可能导致端口耗尽，后期考虑处理，handshake握手成功前是否有必要不申请新的socket，连接建立后再新建socket**
 
 ### Ack
 
@@ -138,6 +160,10 @@ Client-->Server:CONNECTION_CLOSE
 一旦ACK Frame被对端确认（ACK Tracked）那么它所确认的packet不应再次ACK。  
 为了限制接收器状态或ACK Frame的大小，接收器可以限制发送的ACK block数量（这可能导致不必要的重传）。  
 接收方应该优先重复确认最新接收的数据包而不是之前接收的数据包，尽快触发对端标记packet丢失。
+
+ACKOnly的数据包不受拥塞控制限制且不计入 bytes_in_flight
+
+ACK Frame可以包含最近几次（默认3次）发出但未被Tracked的ACK信息
 
 ### 重传
 
@@ -154,33 +180,60 @@ Client-->Server:CONNECTION_CLOSE
 #### 基于超时的重传
 
 + 尾丢失探测（Tail Loss Probe）
-  探测超时（Probe Timeout，PTO） PTO = min(1.5*SRTT+MaxAckDelay, kMinTLPTimeout)  
-  如果RTO小于PTO则 PTO = min(RTO,PTO)  
+  探测超时（Probe Timeout，PTO） PTO = min(max(1.5*SRTT+MaxAckDelay, kMinTLPTimeout),RTO)  
   TLP至少为1.5倍的SRTT是（TCP TLP定义），为了保证ACK过期。  
   为了减少延迟，在RTO定时器之前允许TLP定时器触发两次，当TLP定时器第一次到期，发送TLP分组并重新开始TLP定时器计时，当TLP定时器第二次到期，发送第二次TLP分组并开启RTO定时器计时。  
   TLP数据包应尽可能发送新的数据，如果没有新数据可用或流控限制则可以重传未确认的数据，从而尽可能缩短恢复时间。  
   TLP定时器超时发送探测数据包是在确认数据包丢失之前，因此不应将未确认的数据包标记为丢失状态。
-
+  TLP重传不受拥塞控制限制，但需要计入bytes_in_flight
 
 + 重传超时时间（Retransmission Timeout，RTO）
   当发送最后一个TLP分组时，RTO定时器启动，如果RTO定时器超时，发送方发送两个packet，以唤醒对端进行ACK，并重新启动RTO定时器  
   最后一个TLP发送时 RTO = max(SRTT + 4*RTTVAR + MaxAckDelay, kMinRTOTimeout)  
-  每当RTO定时器超时，则RTO翻倍
+  每当RTO定时器超时，则RTO翻倍  
+  RTO重传不受拥塞控制限制，而是通过RTO惩罚性翻倍来保证收敛
 
 ### 关闭connection流程
 
 发送端数据全部发送完毕，发送CONNECTION_CLOSE主动关闭当前连接，发送后等待Ack
 
 ## 安全性
+相关参数定义：
 
-### Packet加密
++ initial_salt  20bytes随机常量
 
-type 不加密
 
+### Packet加密保护
+long header数据包：
+
+```ditaa{ args=["-E"] code_block=true cmd=false}
++-+--------+------+------+--------------------------+--------------------------+-----------+
+|1|Type(7b)|DL(4b)|SL(4b)|DstConnectionID(4~8 Bytes)|SrcConnectionID(4~8 Bytes)|Payload (*)|
++-+--------+------+------+--------------------------+--------------------------+-----------+
+```
+
+short header数据包：
+
+```ditaa{ args=["-E"] code_block=true cmd=false}
++-+-----+------+--------------------------+---------------------------+-----------+
+|0|R(3b)|DL(4b)|DstConnectionID(4~8 Bytes)|PacketNumber(Varint max=11)|Payload (*)|
++-+-----+------+--------------------------+---------------------------+-----------+
+```
+
+#### Header保护
+
+对long header packet的第一二字节 和 short header packet的第一字节使用 initial_salt[0]与之异或进行隐藏
+对long header packet的 DstID，SrcID字段，short header packet 的 DstID字段 使用采样+init_salt 作为输入生成的密钥 进行AEAD_SHA_128_GCM 加密
 
 ### 放大攻击
 
 避免服务端被放大攻击利用，严格限制对未验证的客户端的响应不会超过客户端请求数据大小。要求连接建立期间，客户端发起的建立连接请求数据包，必须填充到默认数据包最大长度。否则服务器可以不响应。
+
+### 中间人攻击
+
+采用DH密钥协商机制容易收到中间人攻击  
+中间人攻击是指：A和B进行密钥协商，消息被中间人C拦截 A向B发起的密钥协商信息被C拦截，并响应使得AC连接，同时C向B发起协商信息连接到B，这样A发送给B的信息会发送给C，C可以拦截并篡改后再发送给B。  
+要解决中间人攻击问题需要引入证书认证，Server和Client之间进行认证，认证信息需要结合域名、IP等信息进行。暂不考虑在传输层进行认证，由应用(或中间层)按照需要进行认证过程。
 
 ## 客户端验证
 
@@ -189,6 +242,7 @@ type 不加密
 ## 地址欺骗
 
 侦测到连接地址迁移（接收到来自其他源地址的高PN编号的packet），必须对迁移地址进行验证，发送PATH_CHALLENGE帧，在接收到正确的PATH_RESPONSE不会向该地址发送新的数据（防止放大攻击），验证失败继续使用原来的源地址。在此期间来自其他地址的更高PN编号的packet将覆盖当前验证地址。
+
 
 ## Send
 
@@ -219,8 +273,6 @@ type 不加密
 
 ## Receive
 
-**数据接收过程：**
-
 1. 数据包到达socket
 2. io_interface异步接收事件执行，数据填入connection接收队列尾部，通知connection数据到达
 3. connection从接收队列头部解包处理frame，将stream frame的数据填入stream接收缓冲区
@@ -229,23 +281,20 @@ type 不加密
 
 1. stream接收缓冲区，内存片队列，单片8k，带有数据区间记录，只能读取头部连续区间数据。
 2. stream发送缓存区，内存片队列，单片8k，带有数据区间记录，只有头部连续区间可擦除。
-3. connection接收缓存区，内存片队列，单片maxPackSize，每次接收一个数据包独占一片，接收、解包不拷贝数据，数据包解析完毕，stream数据写入stream接收缓存后擦除。
-4. connection发送采用发送时打包的方式，单片maxPackSize
-
-connection缓存大小设计，按照最大包分片，存在一定的内存利用浪费，connection缓冲区容量根据 带宽/数据包处理时间max 来设置
 
 ## 线程安全
 
-设计进行横向的线程划分：
+采用流水线设计来分解处理各阶段任务；每一级流水线对应一个boost::asio::io_services实例，每个io_service绑定到一个线程或线程池处理。
 
-+ 所有io_interface数据包接收操作作为一个集合，投递到同一个io_service上这样可以通过一个独立的线程或线程池来将数据尽快地从socket缓冲区读取到connection中
-+ 所有connection的解包、timer等操作被投递到一个io_service上
+1. io_interface 
+   所有的io_interface投递到同一个io_service中，主要处理两个任务：
+   + 异步接收Packet，解出dstConnectionID，投递到对应注册的connection上
+   + 异步发送connection打包的packet
+2. packet预处理（暂未使用）
+   预处理阶段设计用来对packet进行加解密
+3. connection
+   处理Frame生成、打包、解包工作，每一个connenction通过一个boost::asio::io_service::strand保证处理过程的串行化。
 
-stream缓冲区单片通过mutex互斥
-
-connection缓冲区单片通过C++ automic进行状态标识
-
-## Ack
 
 
 ## receive/sent process
@@ -260,3 +309,10 @@ connection缓冲区单片通过C++ automic进行状态标识
 key point:
 
 1. 只关心connection ID 不关心src ip/port等连接特性。连接迁移。
+
+## 链路信息统计
+
++ RTT
++ Lost
++ Latency
++ 最大延迟波动 ==> 最大包乱序

@@ -1,3 +1,4 @@
-#chrmoe扩展和应用
+# chrmoe扩展和应用
+
 cherome extensions侧重于浏览器相关扩展，扩展与浏览器结合更紧密。
 chrome apps可以看作是基于chrome平台跨平台应用程序，侧重于独立功能的应用，此时chrome更像是一个开发环境和运行环境。
