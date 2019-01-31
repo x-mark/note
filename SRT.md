@@ -1,6 +1,6 @@
 # SRT
 
-基于QUIC协议的一个改进的实现
+参考QUIC协议实现的一个基于UDP的可靠传输协议
 
 ## 零散杂记（候选特性）
 
@@ -26,7 +26,7 @@
 io_interface : socket接口的封装，使用boost::asio::udp::socket。数据收发接口  
 connection : 连接抽象，实现可靠连接。拥塞控制(GC)、流量控制(基于窗口)、Pacing发送、NACK、Retransmission  
 Stream : 轻量级的读写流，相互之间不会阻塞 可以理解为一种弹性的“消息”
-Session :app交互接口，可以在此实现多connection聚合
+Session :管理一个connection上的多个stream
 
 ## Packet类型
 
@@ -34,7 +34,7 @@ Session :app交互接口，可以在此实现多connection聚合
 
 ```ditaa{ args=["-E"] code_block=true cmd=false}
 +-+--------+------+------+--------------------------+--------------------------+-----------+
-|1|Type(7b)|DL(4b)|SL(4b)|DstConnectionID(4~8 Bytes)|SrcConnectionID(4~8 Bytes)|Payload (*)|
+|1|Type(3b)|IDLEN(4b)|DstConnectionID(4~8 Bytes)|SrcConnectionID(4~8 Bytes)|Payload (*)|
 +-+--------+------+------+--------------------------+--------------------------+-----------+
 ```
 
@@ -42,7 +42,7 @@ Session :app交互接口，可以在此实现多connection聚合
 
 ```ditaa{ args=["-E"] code_block=true cmd=false}
 +----+------+------+--------------------------+--------------------------+-------------------------+
-|0x80|DL(4b)|SL(4b)|DstConnectionID(4~8 Bytes)|SrcConnectionID(4~8 Bytes)|CRYPTO Frame(*) (PADDING)|
+|0xF|IDLEN(4b)|DstConnectionID(4~8 Bytes)|SrcConnectionID(4~8 Bytes)|CRYPTO Frame(*) (PADDING)|
 +----+------+------+--------------------------+--------------------------+-------------------------+
 ```
 
@@ -50,7 +50,7 @@ Session :app交互接口，可以在此实现多connection聚合
 
 ```ditaa{ args=["-E"] code_block=true cmd=false}
 +----+------+------+--------------------------+--------------------------+-------------------------------------------+
-|0x81|DL(4b)|SL(4b)|DstConnectionID(4~8 Bytes)|SrcConnectionID(4~8 Bytes)| TokenLen(Varint) Token(TokenLen) (PADDING)|
+|0xE|IDLEN(4b)|DstConnectionID(4~8 Bytes)|SrcConnectionID(4~8 Bytes)| TokenLen(Varint) Token(TokenLen) (PADDING)|
 +----+------+------+--------------------------+--------------------------+-------------------------------------------+
 ```
 
@@ -58,7 +58,7 @@ Session :app交互接口，可以在此实现多connection聚合
 
 ```ditaa{ args=["-E"] code_block=true cmd=false}
 +----+------+------+--------------------------+--------------------------+--------------------------+
-|0x82|DL(4b)|DL(4b)|DstConnectionID(4~8 Bytes)|SrcConnectionID(4~8 Bytes)| CRYPTO Frame(*) (PADDING)|
+|0xD|IDLEN(4b)|DstConnectionID(4~8 Bytes)|SrcConnectionID(4~8 Bytes)| CRYPTO Frame(*) (PADDING)|
 +----+------+------+--------------------------+--------------------------+--------------------------+
 ```
 
@@ -68,7 +68,7 @@ HandShake只能包含CRYPTO，PADDING，CONNECTION_CLOSE Frame，其他的Frame�
 
 ```ditaa{ args=["-E"] code_block=true cmd=false}
 +-+-----+------+--------------------------+---------------------------+-----------+
-|0|R(3b)|DL(4b)|DstConnectionID(4~8 Bytes)|PacketNumber(Varint max=11)|Payload (*)|
+|0|R(3b)|IDLEN(4b)|DstConnectionID(4~8 Bytes)|PacketNumber(Varint max=11)|Payload (*)|
 +-+-----+------+--------------------------+---------------------------+-----------+
 ```
 
@@ -170,10 +170,10 @@ ACK Frame可以包含最近几次（默认3次）发出但未被Tracked的ACK信
 #### 基于ACK的重传
 
 + PacketNumber阈值
-跟踪到Send packet被对端确认，在 最大被确认packet_number - 3 之前发送的packet被标记为丢失
+    跟踪到Send packet被对端确认，在 最大被确认packet_number - 3 之前发送的packet被标记为丢失
 
 + 时间阈值
-跟踪到Send packet被对端确认，在 最大被确认packet_number 之前发送的packet，如果超过时间阈值被标记为丢失。  
+    跟踪到Send packet被对端确认，在 最大被确认packet_number 之前发送的packet，如果超过时间阈值被标记为丢失。  
 时间阈值 = kTimeThreshold * max(SRTT,last_RTT)  
 系数kTimeThreshold默认取9/8（可调整）减小会增大虚假重传的概率 增大会增加丢失检测延迟
 
@@ -198,27 +198,12 @@ ACK Frame可以包含最近几次（默认3次）发出但未被Tracked的ACK信
 发送端数据全部发送完毕，发送CONNECTION_CLOSE主动关闭当前连接，发送后等待Ack
 
 ## 安全性
+
 相关参数定义：
 
 + initial_salt  20bytes随机常量
 
-
 ### Packet加密保护
-long header数据包：
-
-```ditaa{ args=["-E"] code_block=true cmd=false}
-+-+--------+------+------+--------------------------+--------------------------+-----------+
-|1|Type(7b)|DL(4b)|SL(4b)|DstConnectionID(4~8 Bytes)|SrcConnectionID(4~8 Bytes)|Payload (*)|
-+-+--------+------+------+--------------------------+--------------------------+-----------+
-```
-
-short header数据包：
-
-```ditaa{ args=["-E"] code_block=true cmd=false}
-+-+-----+------+--------------------------+---------------------------+-----------+
-|0|R(3b)|DL(4b)|DstConnectionID(4~8 Bytes)|PacketNumber(Varint max=11)|Payload (*)|
-+-+-----+------+--------------------------+---------------------------+-----------+
-```
 
 #### Header保护
 
