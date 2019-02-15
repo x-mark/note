@@ -228,26 +228,19 @@ ACK Frame可以包含最近几次（默认3次）发出但未被Tracked的ACK信
 
 侦测到连接地址迁移（接收到来自其他源地址的高PN编号的packet），必须对迁移地址进行验证，发送PATH_CHALLENGE帧，在接收到正确的PATH_RESPONSE不会向该地址发送新的数据（防止放大攻击），验证失败继续使用原来的源地址。在此期间来自其他地址的更高PN编号的packet将覆盖当前验证地址。
 
-
 ## Send
 
-**数据发送过程：**
+数据发送过程：
 
 1. application向stream wBuffer 写入数据
 2. stream向Session投递trySend事件  
 3. session通知connection发送事件  有多个connection时需要决定向哪个connection投递。（一般只有一个connection）
 4. connection根据状态决定发送时机：立即发送、延迟发送（小数据量delay）、状态改变后发送（blocking）；满足发送条件的数据通过pacing的方式发出
 
-**尝试发送事件:**
+延迟发送：
 
-1. 外部数据写入发送缓冲区 maybeSend
-2. control frame加入 maybeSend
-3. blocking状态改变
-
-**启动定时器：**
-
-1. only ack 延迟 25ms
-2. stream数据量从零到小于阈值 延迟发送200ms
+1. 接收到需要Ack的packet，启动ACK最大延迟定时器，25ms后超时
+2. stream数据量从零到小于立即发送阈值，启动延迟发送定时器，200ms后超时
 
 发送事件：
 
@@ -255,6 +248,7 @@ ACK Frame可以包含最近几次（默认3次）发出但未被Tracked的ACK信
 2. 延迟ack timer超时 sendPacket
 3. ack阈值（第二个full-size packet到达） sendPacket
 4. 待发送数据到达阈值 sendPacket
+5. 控制帧待发送
 
 ## Receive
 
@@ -268,18 +262,6 @@ ACK Frame可以包含最近几次（默认3次）发出但未被Tracked的ACK信
 2. stream发送缓存区，内存片队列，单片8k，带有数据区间记录，只有头部连续区间可擦除。
 
 ## 线程安全
-
-采用流水线设计来分解处理各阶段任务；每一级流水线对应一个boost::asio::io_services实例，每个io_service绑定到一个线程或线程池处理。
-
-1. io_interface 
-   所有的io_interface投递到同一个io_service中，主要处理两个任务：
-   + 异步接收Packet，解出dstConnectionID，投递到对应注册的connection上
-   + 异步发送connection打包的packet
-2. packet预处理（暂未使用）
-   预处理阶段设计用来对packet进行加解密
-3. connection
-   处理Frame生成、打包、解包工作，每一个connenction通过一个boost::asio::io_service::strand保证处理过程的串行化。
-
 
 
 ## receive/sent process
