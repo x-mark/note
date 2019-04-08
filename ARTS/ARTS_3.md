@@ -57,6 +57,12 @@ func longestPalindrome(s string) string {
 ```
 
 ## Review
+[Machine Lerning for Humans Part 2.1 Supervised Learning](https://medium.com/machine-learning-for-humans/supervised-learning-740383a2feab)
+回归：预测一个连续值
+特征(feature)应满足数字的(numerical)或明确的(categorical)
+训练集和测试集
+supervised learning algorithms. 监督学习算法
+
 
 ## Tip
 
