@@ -22,38 +22,38 @@ func longestPalindrome(s string) string {
 	if len(s) < 2 {
 		return s
 	}
-	var substr string
-	for end := 1; end < len(s); end++ {
-		begin := end - 1
-		for s[end] == s[begin] {
-			if len(substr) < end-begin+1 {
-				substr = s[begin : end+1]
-			}
-			if begin > 0 && end < len(s)-1 {
-				begin--
-				end++
+	subBegin, subEnd := 0, 0
+	for pos := 0; pos < 2*(len(s)-1); pos++ {
+		begin, end := 0, 0
+		if pos%2 == 0 {
+			if pos == 0 {
+				begin = 0
+				end = 0
 			} else {
-				break
+				begin = pos/2 - 1
+				end = pos/2 + 1
 			}
+		} else {
+			begin = (pos - 1) / 2
+			end = (pos + 1) / 2
 		}
-	}
-	for end := 2; end < len(s); end++ {
-		begin := end - 2
-		for s[end] == s[begin] {
-			if len(substr) < end-begin+1 {
-				substr = s[begin : end+1]
-			}
-			if begin > 0 && end < len(s)-1 {
-				begin--
-				end++
-			} else {
-				break
-			}
-		}
-	}
 
-	return substr
+		for s[end] == s[begin] {
+			if subEnd-subBegin < end-begin {
+				subBegin = begin
+				subEnd = end
+			}
+			if begin > 0 && end < len(s)-1 {
+				begin--
+				end++
+			} else {
+				break
+			}
+		}
+	}
+	return s[subBegin : subEnd+1]
 }
+//执行时间12ms
 ```
 
 ## Review
