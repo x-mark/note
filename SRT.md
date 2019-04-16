@@ -2,20 +2,13 @@
 
 参考QUIC协议实现的一个基于UDP的可靠传输协议
 
-## 零散杂记（候选特性）
-
-+ 可以使用protobuffer Varint编码方式压缩消息头体积
-+ header和Body的加密不一样，可能有中继节点，body用server和client协商密钥，header使用单次传递消息两端协商的密钥
-+ header里面需要携带server的ip port connectionID或者用两种类型消息包标记转发/直接连接 用于后期组网扩展
-+ connectionID uint64随机产生 降低不正当使用时的冲突问题  最好通过 sitID+random方式保证唯一
-
 ## 层次结构
 
 ```ditaa{ args=["-E"] code_block=true cmd=false}
 +-------------+
-|  Session    |
-+-------------+
 |  Streams    |
++-------------+
+|  Session    |
 +-------------+
 | Connection  |
 +-------------+
@@ -33,33 +26,33 @@ Session :管理一个connection上的多个stream
 ### long header packet
 
 ```ditaa{ args=["-E"] code_block=true cmd=false}
-+-+--------+------+------+--------------------------+--------------------------+-----------+
-|1|Type(3b)|IDLEN(4b)|DstConnectionID(4~8 Bytes)|SrcConnectionID(4~8 Bytes)|Payload (*)|
-+-+--------+------+------+--------------------------+--------------------------+-----------+
++-+--------+------------+--------------------------+--------------------------+-----------+
+|1|Type(3b)|Reserved(4b)|DstConnectionID(4~8 Bytes)|SrcConnectionID(4~8 Bytes)|Payload (*)|
++-+--------+------------+--------------------------+--------------------------+-----------+
 ```
 
 #### Hello
 
 ```ditaa{ args=["-E"] code_block=true cmd=false}
-+----+------+------+--------------------------+--------------------------+-------------------------+
-|0xF|IDLEN(4b)|DstConnectionID(4~8 Bytes)|SrcConnectionID(4~8 Bytes)|CRYPTO Frame(*) (PADDING)|
-+----+------+------+--------------------------+--------------------------+-------------------------+
++----+-----------+--------------------------+--------------------------+-------------------------+
+|0xF|Reserved(4b)|DstConnectionID(4~8 Bytes)|SrcConnectionID(4~8 Bytes)|CRYPTO Frame(*) (PADDING)|
++----+-----------+--------------------------+--------------------------+-------------------------+
 ```
 
 #### Retry
 
 ```ditaa{ args=["-E"] code_block=true cmd=false}
-+----+------+------+--------------------------+--------------------------+-------------------------------------------+
-|0xE|IDLEN(4b)|DstConnectionID(4~8 Bytes)|SrcConnectionID(4~8 Bytes)| TokenLen(Varint) Token(TokenLen) (PADDING)|
-+----+------+------+--------------------------+--------------------------+-------------------------------------------+
++----+----------+--------------------------+--------------------------+-------------------------------------------+
+|0xE|Reserved4b)|DstConnectionID(4~8 Bytes)|SrcConnectionID(4~8 Bytes)| TokenLen(Varint) Token(TokenLen) (PADDING)|
++----+----------+--------------------------+--------------------------+-------------------------------------------+
 ```
 
 #### HandShake
 
 ```ditaa{ args=["-E"] code_block=true cmd=false}
-+----+------+------+--------------------------+--------------------------+--------------------------+
-|0xD|IDLEN(4b)|DstConnectionID(4~8 Bytes)|SrcConnectionID(4~8 Bytes)| CRYPTO Frame(*) (PADDING)|
-+----+------+------+--------------------------+--------------------------+--------------------------+
++----+-----------+--------------------------+--------------------------+--------------------------+
+|0xD|Reserved(4b)|DstConnectionID(4~8 Bytes)|SrcConnectionID(4~8 Bytes)| CRYPTO Frame(*) (PADDING)|
++----+-----------+--------------------------+--------------------------+--------------------------+
 ```
 
 HandShake只能包含CRYPTO，PADDING，CONNECTION_CLOSE Frame，其他的Frame端点都视为Connection Error
@@ -67,9 +60,9 @@ HandShake只能包含CRYPTO，PADDING，CONNECTION_CLOSE Frame，其他的Frame�
 ### short header packet
 
 ```ditaa{ args=["-E"] code_block=true cmd=false}
-+-+-----+------+--------------------------+---------------------------+-----------+
-|0|R(3b)|IDLEN(4b)|DstConnectionID(4~8 Bytes)|PacketNumber(Varint max=11)|Payload (*)|
-+-+-----+------+--------------------------+---------------------------+-----------+
++-+-----+------------+--------------------------+---------------------------+-----------+
+|0|R(3b)|Reserved(4b)|DstConnectionID(4~8 Bytes)|PacketNumber(Varint max=11)|Payload (*)|
++-+-----+------------+--------------------------+---------------------------+-----------+
 ```
 
 ### 帧类型
@@ -96,10 +89,10 @@ HandShake只能包含CRYPTO，PADDING，CONNECTION_CLOSE Frame，其他的Frame�
 
 ```sequence {theme="simple"}
 Note Over Server: listen
+Note Over Server:Accepting Connection
 Client->Server: Hello
 Server-->Client: Retry (token)
 Client-->Server: Hello (token)
-Note Over Server:Accepting Connection
 Server->Client:HandShake
 Note Right Of Client:connected
 
@@ -110,17 +103,18 @@ Server->Client:S0:STREAM(data) ACK-C0
 Client->Server:C1:ACK-S0
 Note Right Of Client:End with ack only
 Note Left Of Server: End with ack only
-Note Left Of Server: If C1 Loss, Tail Loss Probe
+Note Left Of Server: If C1 Loss, Tail Loss Probe 1, dual packets
 Server-->Client:S1:STREAM(data) ACK-C0 [TLP]
-Client-->Server:C2:ACK-S1-S0
-Note Left Of Server: C2 Loss
 Server-->Client:S2:STREAM(data) ACK-C0 [TLP]
-Client-->Server:C3:ACK-S2-S0
-Note Left Of Server:C3 Loss, twice TLP fail,\n RTO Send dual packets
-Server-->Client:S3:STREAM(data) ACK-C0 [RTO]
-Server-->Client:S4:STREAM(data) ACK-C0 [RTO]
-Client-->Server:C4:ACK-S4-S0
-Note Left Of Server: If C4 Loss, RTO Double
+Client-->Server:C2:ACK-S2-S0
+Note Left Of Server:If C2 Loss, Tail Loss Probe 2, dual packets
+Server-->Client:S3:STREAM(data) ACK-C0 [TLP]
+Server-->Client:S4:STREAM(data) ACK-C0 [TLP]
+Client-->Server:C3:ACK-S4-S0
+Note Left Of Server:C3 Loss, twice TLP fail,\n RTO
+Server-->Client:S5:STREAM(ack gap) ACK-C0 [RTO]
+Client-->Server:C4:ACK-S5-S0
+Note Left Of Server: If C4 Loss, RTO 2
 
 
 Client->Server:DATA_BLOCKED/STREAM_DATA_BLOCKED
@@ -142,7 +136,7 @@ Client->Server:ACK([2])
 Note Left Of Server:close stream  S1
 
 Server-->Client:CONNECTION_CLOSE
-Client-->Server:CONNECTION_CLOSE
+Client-->Server:ACK-CONNECTION_CLOSE
 
 ```
 
@@ -193,11 +187,22 @@ ACK Frame可以包含最近几次（默认3次）发出但未被Tracked的ACK信
   每当RTO定时器超时，则RTO翻倍  
   RTO重传不受拥塞控制限制，而是通过RTO惩罚性翻倍来保证收敛
 
-### 关闭connection流程
+### 关闭connection
 
-发送端数据全部发送完毕，发送CONNECTION_CLOSE主动关闭当前连接，发送后等待Ack
++ 需要对端ACK的关闭
++ 不需要对端ACK的关闭
++ 静默直接关闭
 
-## 安全性
+## 流量控制
+
+流量控制设计为stream/connection两级流控窗口，流控窗口每次consume WindowSize/2时通知对端流控窗口更新
+如果流控窗口频繁更新（两次更新间隔小于2*Rtt），则意味着流控窗口可能过小（流控成为传输速度瓶颈）在开启流控窗口自动增长模式（默认开启）时，此时流控窗口会倍增（WindowSize *= 2）。流控窗口增长是一个不对称过程，只会增大不会减小。
+
+## 拥塞控制
+
+拥塞控制采用BBR算法，支持其他拥塞控制集成。
+
+## 安全性（待实现）
 
 相关参数定义：
 
@@ -261,25 +266,8 @@ ACK Frame可以包含最近几次（默认3次）发出但未被Tracked的ACK信
 1. stream接收缓冲区，内存片队列，单片8k，带有数据区间记录，只能读取头部连续区间数据。
 2. stream发送缓存区，内存片队列，单片8k，带有数据区间记录，只有头部连续区间可擦除。
 
-## 线程安全
-
-
-## receive/sent process
-
-任务：
-
-1. 处理读取事件，接收来自io的packet。
-2. 维护connection和IOInterface是的映射关系，IOInterface可复用
-3. 解出packet的connection id投递到对应的指定connection的消息队列
-4. 将cinnection的packet通过IOInterface发出，后期加入路由选择和负载均衡处理
-
-key point:
-
-1. 只关心connection ID 不关心src ip/port等连接特性。连接迁移。
-
 ## 链路信息统计
 
 + RTT
 + Lost
 + Latency
-+ 最大延迟波动 ==> 最大包乱序
