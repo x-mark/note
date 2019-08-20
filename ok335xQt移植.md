@@ -12,7 +12,8 @@ linux kernel：飞凌提供的 linux-kernel-3.2.0
 
 ```shell
 export PATH=/home/xmark/00_app/gcc-linaro-4.9.4-2017.01-x86_64_arm-linux-gnueabihf/bin/:$PATH
-```
+```<!-- slide -->
+
 
 ## kernel编译
 
@@ -100,7 +101,7 @@ SD卡启动系统错误：
 [    3.551706] EXT3-fs (mmcblk0p2): recovery complete
 [    3.562661] EXT3-fs (mmcblk0p2): mounted filesystem with ordered data mode
 [    3.569990] VFS: Mounted root (ext3 filesystem) readonly on device 179:2.
-[    3.577295] devtmpfs: mounted
+[    3.577295] devtmpfs: mounted<!-- slide -->
 [    3.580982] Freeing init memory: 256K
 Bad inittab entry at line 5
 can't open /dev/si: No such file or directory
@@ -351,3 +352,50 @@ export QT_QPA_FONTDIR=$QT_DIR/lib/fonts
 export QT_QPA_PLATFORM_PLUGIN_PATH=$QT_DIR/plugins
 export QT_QPA_GENERIC_PLUGINS=tslib:$TSLIB_TSDEVICE
 ```
+
+```
+nandrootfstype=yaffs2 rootwait=1
+nandrootfstype=ubi rootwait=1
+
+env set nandrootfstype "ubi rootwait=1"
+
+led all on;
+setenv TYPE 0;
+nand erase.chip;
+mmc rescan; 
+setenv TYPE 1;
+fatload mmc 0 80A00000 MLO;
+setenv TYPE 2;
+nand write.i 80A00000 0 ${filesize}; 
+setenv TYPE 2;
+nand write.i 80A00000 0x20000 ${filesize}; 
+setenv TYPE 2;
+nand write.i 80A00000 0x40000 ${filesize}; 
+setenv TYPE 2;
+nand write.i 80A00000 0x60000 ${filesize}; 
+setenv TYPE 2;
+nand write.i 80A00000 0x80000 ${filesize}; 
+setenv TYPE 2;
+nand write.i 80A00000 0x100000 ${filesize}; 
+setenv TYPE 2;
+nand write.i 80A00000 0x180000 ${filesize}; 
+setenv TYPE 3;
+fatload mmc 0 80A00000 u-boot.img;
+setenv TYPE 4;
+nand write.i 80A00000 800000 ${filesize}; 
+setenv TYPE 4;
+nand write.i 80A00000 400000 ${filesize}; 
+setenv TYPE 5;
+fatload mmc 0 80A00000 uImage;    
+setenv TYPE 6;
+nand write.i 80A00000 c00000 ${filesize}; 
+setenv TYPE 7;
+fatload mmc 0 80A00000 ubi.img;     
+setenv TYPE 8;
+nand write.i 80A00000 1400000 ${filesize};
+setenv TYPE 9;
+fatload mmc 0 80A00000 logo.bmp;  
+setenv TYPE 10;
+nand write.i 80A00000 600000 ${filesize};
+```
+
