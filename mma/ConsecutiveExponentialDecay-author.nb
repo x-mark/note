@@ -1,0 +1,1316 @@
+(* Content-type: application/mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 6.0' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       145,          7]
+NotebookDataLength[     49393,       1307]
+NotebookOptionsPosition[     44338,       1143]
+NotebookOutlinePosition[     46110,       1201]
+CellTagsIndexPosition[     45782,       1189]
+WindowFrame->Normal
+ContainsDynamic->True *)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+
+Cell[CellGroupData[{
+Cell["Consecutive Exponential Decay", "DemoTitle",
+ CellChangeTimes->{
+  3.35696210375764*^9, {3.400236494609375*^9, 3.400236501828125*^9}, {
+   3.40030033234375*^9, 3.400300341609375*^9}}],
+
+Cell[CellGroupData[{
+
+Cell["", "InitializationSection"],
+
+Cell[BoxData[
+ RowBox[{"ratio", "=."}]], "Input",
+ CellChangeTimes->{
+  3.35696210375764*^9, {3.400300428671875*^9, 3.400300444265625*^9}},
+ CellID->606310703],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"funcs", "=", 
+   RowBox[{"{", "\[IndentingNewLine]", 
+    RowBox[{
+     RowBox[{"a0", " ", 
+      SuperscriptBox["\[ExponentialE]", 
+       RowBox[{
+        RowBox[{"-", "ka"}], " ", "t"}]]}], ",", "\[IndentingNewLine]", 
+     RowBox[{"If", "[", 
+      RowBox[{
+       RowBox[{"ratio", "\[Equal]", "1"}], ",", 
+       RowBox[{"a0", " ", 
+        SuperscriptBox["\[ExponentialE]", 
+         RowBox[{
+          RowBox[{"-", "ka"}], " ", "t"}]], " ", "ka", " ", "t"}], ",", 
+       "\[IndentingNewLine]", 
+       FractionBox[
+        RowBox[{"a0", " ", 
+         RowBox[{"(", 
+          RowBox[{
+           SuperscriptBox["\[ExponentialE]", 
+            RowBox[{
+             RowBox[{"-", "ka"}], " ", "t"}]], "-", 
+           SuperscriptBox["\[ExponentialE]", 
+            RowBox[{"-", 
+             FractionBox[
+              RowBox[{"ka", " ", "t"}], "ratio"]}]]}], ")"}], " ", "ratio"}], 
+        
+        RowBox[{"1", "-", "ratio"}]]}], "]"}], ",", "\[IndentingNewLine]", 
+     RowBox[{"If", "[", 
+      RowBox[{
+       RowBox[{"ratio", "\[Equal]", "1"}], ",", 
+       RowBox[{"a0", " ", 
+        SuperscriptBox["\[ExponentialE]", 
+         RowBox[{
+          RowBox[{"-", "ka"}], " ", "t"}]], " ", 
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{"-", "1"}], "+", 
+          SuperscriptBox["\[ExponentialE]", 
+           RowBox[{"ka", " ", "t"}]], "-", 
+          RowBox[{"ka", " ", "t"}]}], ")"}]}], ",", "\[IndentingNewLine]", 
+       FractionBox[
+        RowBox[{"a0", " ", 
+         RowBox[{"(", 
+          RowBox[{"1", "-", 
+           SuperscriptBox["\[ExponentialE]", 
+            RowBox[{
+             RowBox[{"-", "ka"}], " ", "t"}]], "-", "ratio", "+", 
+           RowBox[{
+            SuperscriptBox["\[ExponentialE]", 
+             RowBox[{"-", 
+              FractionBox[
+               RowBox[{"ka", " ", "t"}], "ratio"]}]], " ", "ratio"}]}], 
+          ")"}]}], 
+        RowBox[{"1", "-", "ratio"}]]}], "]"}]}], "\[IndentingNewLine]", 
+    "}"}]}], ";"}]], "Input",
+ CellChangeTimes->{
+  3.35696210375764*^9, {3.40029916071875*^9, 3.400299165515625*^9}},
+ CellID->594894746]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["", "ManipulateSection"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"Manipulate", "[", "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{"Plot", "[", 
+    RowBox[{
+     RowBox[{"Evaluate", "[", 
+      RowBox[{"funcs", " ", "/.", " ", 
+       RowBox[{"{", 
+        RowBox[{
+         RowBox[{"ka", "\[Rule]", "kk"}], ",", 
+         RowBox[{"ratio", "\[Rule]", "r"}], ",", 
+         RowBox[{"a0", "\[Rule]", " ", "1"}]}], "}"}]}], "]"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"t", ",", "0", ",", "10"}], "}"}], ",", " ", 
+     RowBox[{"PlotRange", "\[Rule]", "All"}], ",", " ", 
+     RowBox[{"Frame", "\[Rule]", " ", "True"}], ",", " ", 
+     RowBox[{"PlotStyle", "\[Rule]", " ", 
+      RowBox[{"{", 
+       RowBox[{"Red", ",", " ", "Brown", ",", " ", "Purple"}], "}"}]}], ",", 
+     " ", 
+     RowBox[{"Epilog", "\[Rule]", " ", 
+      RowBox[{"{", 
+       RowBox[{"Red", ",", 
+        RowBox[{"Text", "[", 
+         RowBox[{
+          RowBox[{"Row", "[", 
+           RowBox[{"{", 
+            RowBox[{"\"\<[\>\"", ",", 
+             RowBox[{"Style", "[", 
+              RowBox[{"\"\<A\>\"", ",", "Italic"}], "]"}], ",", "\"\<]\>\""}],
+             "}"}], "]"}], ",", 
+          RowBox[{"{", 
+           RowBox[{"9", ",", "0.9"}], "}"}]}], "]"}], ",", "Brown", ",", 
+        "\[IndentingNewLine]", 
+        RowBox[{"Text", "[", 
+         RowBox[{
+          RowBox[{"Row", "[", 
+           RowBox[{"{", 
+            RowBox[{"\"\<[\>\"", ",", 
+             RowBox[{"Style", "[", 
+              RowBox[{"\"\<B\>\"", ",", "Italic"}], "]"}], ",", "\"\<]\>\""}],
+             "}"}], "]"}], ",", 
+          RowBox[{"{", 
+           RowBox[{"9", ",", "0.8"}], "}"}]}], "]"}], ",", "Purple", ",", 
+        "\[IndentingNewLine]", 
+        RowBox[{"Text", "[", 
+         RowBox[{
+          RowBox[{"Row", "[", 
+           RowBox[{"{", 
+            RowBox[{"\"\<[\>\"", ",", 
+             RowBox[{"Style", "[", 
+              RowBox[{"\"\<C\>\"", ",", "Italic"}], "]"}], ",", "\"\<]\>\""}],
+             "}"}], "]"}], ",", 
+          RowBox[{"{", 
+           RowBox[{"9", ",", "0.7"}], "}"}]}], "]"}], ",", "Black", ",", 
+        "\[IndentingNewLine]", 
+        RowBox[{"With", "[", 
+         RowBox[{
+          RowBox[{"{", 
+           RowBox[{"k", "=", "k"}], "}"}], ",", 
+          RowBox[{"Text", "[", 
+           RowBox[{
+            RowBox[{"TraditionalForm", "@", 
+             RowBox[{"Row", "[", 
+              RowBox[{"{", 
+               RowBox[{
+                FractionBox[
+                 SubscriptBox["k", "a"], 
+                 SubscriptBox["k", "b"]], ",", "\"\< = \>\"", ",", 
+                RowBox[{"NumberForm", "[", 
+                 RowBox[{"r", " ", ",", 
+                  RowBox[{"{", 
+                   RowBox[{"5", ",", "1"}], "}"}]}], "]"}]}], "}"}], "]"}]}], 
+            ",", 
+            RowBox[{"{", 
+             RowBox[{"9", ",", "0.5"}], "}"}]}], "]"}]}], "]"}]}], "}"}]}], 
+     ",", 
+     RowBox[{"ImageSize", "\[Rule]", 
+      RowBox[{"{", 
+       RowBox[{"500", ",", "350"}], "}"}]}]}], "\[IndentingNewLine]", "]"}], 
+   ",", "\[IndentingNewLine]", " ", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{"kk", ",", "1", ",", 
+       RowBox[{"Subscript", "[", 
+        RowBox[{"\"\<k\>\"", ",", "\"\<a\>\""}], "]"}]}], "}"}], ",", "0.1", 
+     ",", "10", ",", 
+     RowBox[{"Appearance", "\[Rule]", "\"\<Labeled\>\""}]}], "}"}], ",", 
+   "\[IndentingNewLine]", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{"r", ",", "1", ",", 
+       RowBox[{
+        RowBox[{"Subscript", "[", 
+         RowBox[{"\"\<k\>\"", ",", "\"\<a\>\""}], "]"}], "/", 
+        RowBox[{"Subscript", "[", 
+         RowBox[{"\"\<k\>\"", ",", "\"\<b\>\""}], "]"}]}]}], "}"}], ",", 
+     "0.01", ",", "10", ",", 
+     RowBox[{"Appearance", "\[Rule]", "\"\<Labeled\>\""}]}], "}"}], ",", 
+   RowBox[{"SaveDefinitions", "\[Rule]", "True"}]}], "]"}]], "Input",
+ CellChangeTimes->{
+  3.35696210375764*^9, 3.400236701515625*^9, {3.40023701925*^9, 
+   3.400237027703125*^9}, {3.400298319265625*^9, 3.40029837575*^9}, {
+   3.4002984058125*^9, 3.40029845715625*^9}, {3.400300494125*^9, 
+   3.400300505984375*^9}, {3.400324556339772*^9, 3.4003245824803967`*^9}, {
+   3.400325137839772*^9, 3.400325146621022*^9}, {3.400437081743927*^9, 
+   3.4004371358373313`*^9}, {3.400584517532112*^9, 3.400584546375862*^9}, {
+   3.4348161924832525`*^9, 3.434816214628467*^9}}],
+
+Cell[BoxData[
+ TagBox[
+  StyleBox[
+   DynamicModuleBox[{$CellContext`kk$$ = 1, $CellContext`r$$ = 1, 
+    Typeset`show$$ = True, Typeset`bookmarkList$$ = {}, 
+    Typeset`bookmarkMode$$ = "Menu", Typeset`animator$$, Typeset`animvar$$ = 
+    1, Typeset`name$$ = "\"untitled\"", Typeset`specs$$ = {{{
+       Hold[$CellContext`kk$$], 1, 
+       Subscript["k", "a"]}, 0.1, 10}, {{
+       Hold[$CellContext`r$$], 1, Subscript["k", "a"]/Subscript["k", "b"]}, 
+      0.01, 10}}, Typeset`size$$ = {500., {173., 177.}}, Typeset`update$$ = 0,
+     Typeset`initDone$$, Typeset`skipInitDone$$ = 
+    False, $CellContext`kk$13696$$ = 0, $CellContext`r$13697$$ = 0}, 
+    DynamicBox[Manipulate`ManipulateBoxes[
+     1, StandardForm, 
+      "Variables" :> {$CellContext`kk$$ = 1, $CellContext`r$$ = 1}, 
+      "ControllerVariables" :> {
+        Hold[$CellContext`kk$$, $CellContext`kk$13696$$, 0], 
+        Hold[$CellContext`r$$, $CellContext`r$13697$$, 0]}, 
+      "OtherVariables" :> {
+       Typeset`show$$, Typeset`bookmarkList$$, Typeset`bookmarkMode$$, 
+        Typeset`animator$$, Typeset`animvar$$, Typeset`name$$, 
+        Typeset`specs$$, Typeset`size$$, Typeset`update$$, Typeset`initDone$$,
+         Typeset`skipInitDone$$}, "Body" :> Plot[
+        Evaluate[
+         ReplaceAll[$CellContext`funcs, {$CellContext`ka -> \
+$CellContext`kk$$, $CellContext`ratio -> $CellContext`r$$, $CellContext`a0 -> 
+           1}]], {$CellContext`t, 0, 10}, PlotRange -> All, Frame -> True, 
+        PlotStyle -> {Red, Brown, Purple}, Epilog -> {Red, 
+          Text[
+           Row[{"[", 
+             Style["A", Italic], "]"}], {9, 0.9}], Brown, 
+          Text[
+           Row[{"[", 
+             Style["B", Italic], "]"}], {9, 0.8}], Purple, 
+          Text[
+           Row[{"[", 
+             Style["C", Italic], "]"}], {9, 0.7}], Black, 
+          With[{$CellContext`k$ = $CellContext`k}, 
+           Text[
+            TraditionalForm[
+             
+             Row[{Subscript[$CellContext`k$, $CellContext`a]/
+               Subscript[$CellContext`k$, $CellContext`b], " = ", 
+               NumberForm[$CellContext`r$$, {5, 1}]}]], {9, 0.5}]]}, 
+        ImageSize -> {500, 350}], 
+      "Specifications" :> {{{$CellContext`kk$$, 1, 
+          Subscript["k", "a"]}, 0.1, 10, Appearance -> 
+         "Labeled"}, {{$CellContext`r$$, 1, Subscript["k", "a"]/Subscript[
+          "k", "b"]}, 0.01, 10, Appearance -> "Labeled"}}, "Options" :> {}, 
+      "DefaultOptions" :> {ControllerLinking -> True}],
+     ImageSizeCache->{548., {232., 237.}},
+     SingleEvaluation->True],
+    Deinitialization:>None,
+    DynamicModuleValues:>{},
+    Initialization:>({$CellContext`funcs = {$CellContext`a0/
+         E^($CellContext`ka $CellContext`t), 
+         If[$CellContext`ratio == 
+          1, (($CellContext`a0 $CellContext`ka) $CellContext`t)/
+          E^($CellContext`ka $CellContext`t), (($CellContext`a0 (
+             E^((-$CellContext`ka) $CellContext`t) - 
+             E^(-(($CellContext`ka $CellContext`t)/$CellContext`ratio)))) \
+$CellContext`ratio)/(1 - $CellContext`ratio)], 
+         If[$CellContext`ratio == 
+          1, ($CellContext`a0 (-1 + 
+            E^($CellContext`ka $CellContext`t) - $CellContext`ka \
+$CellContext`t))/
+          E^($CellContext`ka $CellContext`t), ($CellContext`a0 (1 - 
+            E^((-$CellContext`ka) $CellContext`t) - $CellContext`ratio + \
+$CellContext`ratio/E^(($CellContext`ka $CellContext`t)/$CellContext`ratio)))/(
+          1 - $CellContext`ratio)]}, Attributes[PlotRange] = {ReadProtected}, 
+       Attributes[Subscript] = {NHoldRest}, 
+       Subscript[$CellContext`w, $CellContext`opt] = {1.7400464392730235`, 
+        17.519153111103467`}}; Typeset`initDone$$ = True),
+    SynchronousInitialization->True,
+    UnsavedVariables:>{Typeset`initDone$$},
+    UntrackedVariables:>{Typeset`size$$}], "Manipulate",
+   Deployed->True,
+   StripOnInput->False],
+  Manipulate`InterpretManipulate[1]]], "Output",
+ CellID->5701058]
+}, {2}]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["", "ManipulateCaptionSection"],
+
+Cell[TextData[{
+ "A reaction ",
+ Cell[BoxData[
+  FormBox[
+   RowBox[{"A", 
+    OverscriptBox[
+     RowBox[{" ", 
+      RowBox[{"\[LongRightArrow]", " "}]}], 
+     SubscriptBox["k", "a"]], 
+    RowBox[{"B", " ", 
+     OverscriptBox["\[LongRightArrow]", 
+      SubscriptBox["k", "b"]], " ", "C", " "}]}], TraditionalForm]], 
+  "InlineMath"],
+ " with rate constants ",
+ Cell[BoxData[
+  FormBox[
+   RowBox[{
+    SubscriptBox["k", "a"], " "}], TraditionalForm]], "InlineMath"],
+ "and ",
+ Cell[BoxData[
+  FormBox[
+   SubscriptBox["k", "b"], TraditionalForm]], "InlineMath"],
+ " is shown; you can vary ",
+ Cell[BoxData[
+  FormBox[
+   SubscriptBox["k", "a"], TraditionalForm]], "InlineMath"],
+ " and the ratio ",
+ Cell[BoxData[
+  FormBox[
+   FractionBox[
+    SubscriptBox["k", "a"], 
+    SubscriptBox["k", "b"]], TraditionalForm]], "InlineMath"],
+ ". Plots are shown for the time-dependent concentrations that are solutions \
+to the corresponding differential equations:"
+}], "ManipulateCaption",
+ CellChangeTimes->{
+  3.35696210375764*^9, {3.400298644875*^9, 3.4002986883125*^9}, {
+   3.400298745859375*^9, 3.4002987845*^9}, {3.40029885771875*^9, 
+   3.400298863890625*^9}, {3.4003006483125*^9, 3.4003006783125*^9}, {
+   3.4003017110901003`*^9, 3.4003017455581884`*^9}, {3.400324661902272*^9, 
+   3.4003246653866467`*^9}, {3.400324743308522*^9, 3.4003247451991467`*^9}, {
+   3.4003251565428967`*^9, 3.4003251566053967`*^9}, {3.4003633694272547`*^9, 
+   3.4003634126147547`*^9}, {3.4003634598491297`*^9, 3.4003635249585047`*^9}, 
+   3.4004371613684177`*^9},
+ CellID->159325440],
+
+Cell[TextData[{
+ Cell[BoxData[
+  FormBox[
+   RowBox[{
+    RowBox[{
+     SubscriptBox["\[PartialD]", "t"], " ", 
+     RowBox[{"a", "(", "t", ")"}]}], "=", 
+    RowBox[{
+     RowBox[{"-", 
+      SubscriptBox["k", "a"]}], " ", 
+     RowBox[{"a", "(", "t", ")"}]}]}], TraditionalForm]], "InlineMath"],
+ " "
+}], "ManipulateCaption",
+ CellChangeTimes->{
+  3.35696210375764*^9, {3.400298644875*^9, 3.4002986883125*^9}, {
+   3.400298745859375*^9, 3.4002987845*^9}, {3.40029885771875*^9, 
+   3.400298863890625*^9}, {3.4003006483125*^9, 3.4003006783125*^9}, {
+   3.4003017110901003`*^9, 3.4003017455581884`*^9}, {3.400324661902272*^9, 
+   3.4003247032303967`*^9}},
+ CellID->129851514],
+
+Cell[TextData[Cell[BoxData[
+ FormBox[
+  RowBox[{
+   RowBox[{
+    SubscriptBox["\[PartialD]", "t"], " ", 
+    RowBox[{"b", "(", "t", ")"}]}], "=", 
+   RowBox[{
+    RowBox[{
+     SubscriptBox["k", "a"], " ", 
+     RowBox[{"a", "(", "t", ")"}]}], "-", 
+    RowBox[{
+     SubscriptBox["k", "b"], " ", 
+     RowBox[{"b", "(", "t", ")"}]}]}]}], 
+  TraditionalForm]], "InlineMath"]], "ManipulateCaption",
+ CellChangeTimes->{
+  3.35696210375764*^9, {3.400298644875*^9, 3.4002986883125*^9}, {
+   3.400298745859375*^9, 3.4002987845*^9}, {3.40029885771875*^9, 
+   3.400298863890625*^9}, {3.4003006483125*^9, 3.4003006783125*^9}, {
+   3.4003017110901003`*^9, 3.400301734636523*^9}, {3.4003246728241467`*^9, 
+   3.4003246762303967`*^9}, {3.400324707058522*^9, 3.4003247239803967`*^9}},
+ CellID->63773798],
+
+Cell[TextData[Cell[BoxData[
+ FormBox[
+  RowBox[{
+   RowBox[{
+    SubscriptBox["\[PartialD]", "t"], " ", 
+    RowBox[{"c", "(", "t", ")"}]}], "=", 
+   RowBox[{
+    SubscriptBox["k", "b"], " ", 
+    RowBox[{"b", "(", "t", ")"}]}]}], 
+  TraditionalForm]], "InlineMath"]], "ManipulateCaption",
+ CellChangeTimes->{
+  3.35696210375764*^9, {3.400298644875*^9, 3.4002986883125*^9}, {
+   3.400298745859375*^9, 3.4002987845*^9}, {3.40029885771875*^9, 
+   3.400298863890625*^9}, {3.4003006483125*^9, 3.4003006783125*^9}, {
+   3.4003017110901003`*^9, 3.4003017408082795`*^9}, {3.400324639089772*^9, 
+   3.400324644058522*^9}, {3.400324682339772*^9, 3.400324684652272*^9}, {
+   3.4003247272303967`*^9, 3.400324736246022*^9}},
+ CellID->215698967],
+
+Cell["\<\
+More information on the solutions and special cases can be found in Details.\
+\>", "ManipulateCaption",
+ CellChangeTimes->{
+  3.35696210375764*^9, {3.400298644875*^9, 3.4002986883125*^9}, {
+   3.400298745859375*^9, 3.4002987845*^9}, {3.40029885771875*^9, 
+   3.400298863890625*^9}, {3.4003006483125*^9, 3.4003006783125*^9}, {
+   3.4003017110901003`*^9, 3.4003017408082795`*^9}, {3.400324639089772*^9, 
+   3.400324644058522*^9}, 3.4003635364897547`*^9, 3.400437212399341*^9, {
+   3.400584500750862*^9, 3.400584503422737*^9}},
+ CellID->201600998]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["", "ThumbnailSection"],
+
+Cell[BoxData[
+ TagBox[
+  StyleBox[
+   DynamicModuleBox[{$CellContext`kk$$ = 1, $CellContext`r$$ = 1, 
+    Typeset`show$$ = True, Typeset`bookmarkList$$ = {}, 
+    Typeset`bookmarkMode$$ = "Menu", Typeset`animator$$, Typeset`animvar$$ = 
+    1, Typeset`name$$ = "\"untitled\"", Typeset`specs$$ = {{{
+       Hold[$CellContext`kk$$], 1, 
+       Subscript["k", "a"]}, 0.1, 10}, {{
+       Hold[$CellContext`r$$], 1, Subscript["k", "a"]/Subscript["k", "b"]}, 
+      0.01, 10}}, Typeset`size$$ = {500., {173., 177.}}, Typeset`update$$ = 0,
+     Typeset`initDone$$, Typeset`skipInitDone$$ = 
+    False, $CellContext`kk$13752$$ = 0, $CellContext`r$13753$$ = 0}, 
+    DynamicBox[Manipulate`ManipulateBoxes[
+     1, StandardForm, 
+      "Variables" :> {$CellContext`kk$$ = 1, $CellContext`r$$ = 1}, 
+      "ControllerVariables" :> {
+        Hold[$CellContext`kk$$, $CellContext`kk$13752$$, 0], 
+        Hold[$CellContext`r$$, $CellContext`r$13753$$, 0]}, 
+      "OtherVariables" :> {
+       Typeset`show$$, Typeset`bookmarkList$$, Typeset`bookmarkMode$$, 
+        Typeset`animator$$, Typeset`animvar$$, Typeset`name$$, 
+        Typeset`specs$$, Typeset`size$$, Typeset`update$$, Typeset`initDone$$,
+         Typeset`skipInitDone$$}, "Body" :> Plot[
+        Evaluate[
+         ReplaceAll[$CellContext`funcs, {$CellContext`ka -> \
+$CellContext`kk$$, $CellContext`ratio -> $CellContext`r$$, $CellContext`a0 -> 
+           1}]], {$CellContext`t, 0, 10}, PlotRange -> All, Frame -> True, 
+        PlotStyle -> {Red, Brown, Purple}, Epilog -> {Red, 
+          Text[
+           Row[{"[", 
+             Style["A", Italic], "]"}], {9, 0.9}], Brown, 
+          Text[
+           Row[{"[", 
+             Style["B", Italic], "]"}], {9, 0.8}], Purple, 
+          Text[
+           Row[{"[", 
+             Style["C", Italic], "]"}], {9, 0.7}], Black, 
+          With[{$CellContext`k$ = $CellContext`k}, 
+           Text[
+            TraditionalForm[
+             
+             Row[{Subscript[$CellContext`k$, $CellContext`a]/
+               Subscript[$CellContext`k$, $CellContext`b], " = ", 
+               NumberForm[$CellContext`r$$, {5, 1}]}]], {9, 0.5}]]}, 
+        ImageSize -> {500, 350}], 
+      "Specifications" :> {{{$CellContext`kk$$, 1, 
+          Subscript["k", "a"]}, 0.1, 10, Appearance -> 
+         "Labeled"}, {{$CellContext`r$$, 1, Subscript["k", "a"]/Subscript[
+          "k", "b"]}, 0.01, 10, Appearance -> "Labeled"}}, "Options" :> {}, 
+      "DefaultOptions" :> {ControllerLinking -> True}],
+     ImageSizeCache->{548., {232., 237.}},
+     SingleEvaluation->True],
+    Deinitialization:>None,
+    DynamicModuleValues:>{},
+    Initialization:>({$CellContext`funcs = {$CellContext`a0/
+         E^($CellContext`ka $CellContext`t), 
+         If[$CellContext`ratio == 
+          1, (($CellContext`a0 $CellContext`ka) $CellContext`t)/
+          E^($CellContext`ka $CellContext`t), (($CellContext`a0 (
+             E^((-$CellContext`ka) $CellContext`t) - 
+             E^(-(($CellContext`ka $CellContext`t)/$CellContext`ratio)))) \
+$CellContext`ratio)/(1 - $CellContext`ratio)], 
+         If[$CellContext`ratio == 
+          1, ($CellContext`a0 (-1 + 
+            E^($CellContext`ka $CellContext`t) - $CellContext`ka \
+$CellContext`t))/
+          E^($CellContext`ka $CellContext`t), ($CellContext`a0 (1 - 
+            E^((-$CellContext`ka) $CellContext`t) - $CellContext`ratio + \
+$CellContext`ratio/E^(($CellContext`ka $CellContext`t)/$CellContext`ratio)))/(
+          1 - $CellContext`ratio)]}, Attributes[PlotRange] = {ReadProtected}, 
+       Attributes[Subscript] = {NHoldRest}, 
+       Subscript[$CellContext`w, $CellContext`opt] = {1.7400464392730235`, 
+        17.519153111103467`}}; Typeset`initDone$$ = True),
+    SynchronousInitialization->True,
+    UnsavedVariables:>{Typeset`initDone$$},
+    UntrackedVariables:>{Typeset`size$$}], "Manipulate",
+   Deployed->True,
+   StripOnInput->False],
+  Manipulate`InterpretManipulate[1]]], "Output",
+ CellID->368597233]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["", "SnapshotsSection"],
+
+Cell[BoxData[
+ TagBox[
+  StyleBox[
+   DynamicModuleBox[{$CellContext`kk$$ = 1, $CellContext`r$$ = 1, 
+    Typeset`show$$ = True, Typeset`bookmarkList$$ = {}, 
+    Typeset`bookmarkMode$$ = "Menu", Typeset`animator$$, Typeset`animvar$$ = 
+    1, Typeset`name$$ = "\"untitled\"", Typeset`specs$$ = {{{
+       Hold[$CellContext`kk$$], 1, 
+       Subscript["k", "a"]}, 0.1, 10}, {{
+       Hold[$CellContext`r$$], 1, Subscript["k", "a"]/Subscript["k", "b"]}, 
+      0.01, 10}}, Typeset`size$$ = Automatic, Typeset`update$$ = 0, 
+    Typeset`initDone$$, Typeset`skipInitDone$$ = 
+    False, $CellContext`kk$13808$$ = 0, $CellContext`r$13809$$ = 0}, 
+    DynamicBox[Manipulate`ManipulateBoxes[
+     1, StandardForm, 
+      "Variables" :> {$CellContext`kk$$ = 1, $CellContext`r$$ = 1}, 
+      "ControllerVariables" :> {
+        Hold[$CellContext`kk$$, $CellContext`kk$13808$$, 0], 
+        Hold[$CellContext`r$$, $CellContext`r$13809$$, 0]}, 
+      "OtherVariables" :> {
+       Typeset`show$$, Typeset`bookmarkList$$, Typeset`bookmarkMode$$, 
+        Typeset`animator$$, Typeset`animvar$$, Typeset`name$$, 
+        Typeset`specs$$, Typeset`size$$, Typeset`update$$, Typeset`initDone$$,
+         Typeset`skipInitDone$$}, "Body" :> Plot[
+        Evaluate[
+         ReplaceAll[$CellContext`funcs, {$CellContext`ka -> \
+$CellContext`kk$$, $CellContext`ratio -> $CellContext`r$$, $CellContext`a0 -> 
+           1}]], {$CellContext`t, 0, 10}, PlotRange -> All, Frame -> True, 
+        PlotStyle -> {Red, Brown, Purple}, Epilog -> {Red, 
+          Text[
+           Row[{"[", 
+             Style["A", Italic], "]"}], {9, 0.9}], Brown, 
+          Text[
+           Row[{"[", 
+             Style["B", Italic], "]"}], {9, 0.8}], Purple, 
+          Text[
+           Row[{"[", 
+             Style["C", Italic], "]"}], {9, 0.7}], Black, 
+          With[{$CellContext`k$ = $CellContext`k}, 
+           Text[
+            TraditionalForm[
+             
+             Row[{Subscript[$CellContext`k$, $CellContext`a]/
+               Subscript[$CellContext`k$, $CellContext`b], " = ", 
+               NumberForm[$CellContext`r$$, {5, 1}]}]], {9, 0.5}]]}, 
+        ImageSize -> {500, 350}], 
+      "Specifications" :> {{{$CellContext`kk$$, 1, 
+          Subscript["k", "a"]}, 0.1, 10, Appearance -> 
+         "Labeled"}, {{$CellContext`r$$, 1, Subscript["k", "a"]/Subscript[
+          "k", "b"]}, 0.01, 10, Appearance -> "Labeled"}}, "Options" :> {}, 
+      "DefaultOptions" :> {ControllerLinking -> True}],
+     SingleEvaluation->True],
+    Deinitialization:>None,
+    DynamicModuleValues:>{},
+    Initialization:>({$CellContext`funcs = {$CellContext`a0/
+         E^($CellContext`ka $CellContext`t), 
+         If[$CellContext`ratio == 
+          1, (($CellContext`a0 $CellContext`ka) $CellContext`t)/
+          E^($CellContext`ka $CellContext`t), (($CellContext`a0 (
+             E^((-$CellContext`ka) $CellContext`t) - 
+             E^(-(($CellContext`ka $CellContext`t)/$CellContext`ratio)))) \
+$CellContext`ratio)/(1 - $CellContext`ratio)], 
+         If[$CellContext`ratio == 
+          1, ($CellContext`a0 (-1 + 
+            E^($CellContext`ka $CellContext`t) - $CellContext`ka \
+$CellContext`t))/
+          E^($CellContext`ka $CellContext`t), ($CellContext`a0 (1 - 
+            E^((-$CellContext`ka) $CellContext`t) - $CellContext`ratio + \
+$CellContext`ratio/E^(($CellContext`ka $CellContext`t)/$CellContext`ratio)))/(
+          1 - $CellContext`ratio)]}, Attributes[PlotRange] = {ReadProtected}, 
+       Attributes[Subscript] = {NHoldRest}, 
+       Subscript[$CellContext`w, $CellContext`opt] = {1.7400464392730235`, 
+        17.519153111103467`}}; Typeset`initDone$$ = True),
+    SynchronousInitialization->True,
+    UnsavedVariables:>{Typeset`initDone$$},
+    UntrackedVariables:>{Typeset`size$$}], "Manipulate",
+   Deployed->True,
+   StripOnInput->False],
+  Manipulate`InterpretManipulate[1]]], "Output",
+ CellID->454225291],
+
+Cell[BoxData[
+ TagBox[
+  StyleBox[
+   DynamicModuleBox[{$CellContext`kk$$ = 1, $CellContext`r$$ = 7.12, 
+    Typeset`show$$ = True, Typeset`bookmarkList$$ = {}, 
+    Typeset`bookmarkMode$$ = "Menu", Typeset`animator$$, Typeset`animvar$$ = 
+    1, Typeset`name$$ = "\"untitled\"", Typeset`specs$$ = {{{
+       Hold[$CellContext`kk$$], 1, 
+       Subscript["k", "a"]}, 0.1, 10}, {{
+       Hold[$CellContext`r$$], 7.12, Subscript["k", "a"]/Subscript["k", "b"]},
+       0.01, 10}}, Typeset`size$$ = Automatic, Typeset`update$$ = 0, 
+    Typeset`initDone$$, Typeset`skipInitDone$$ = 
+    False, $CellContext`kk$13864$$ = 0, $CellContext`r$13865$$ = 0}, 
+    DynamicBox[Manipulate`ManipulateBoxes[
+     1, StandardForm, 
+      "Variables" :> {$CellContext`kk$$ = 1, $CellContext`r$$ = 7.12}, 
+      "ControllerVariables" :> {
+        Hold[$CellContext`kk$$, $CellContext`kk$13864$$, 0], 
+        Hold[$CellContext`r$$, $CellContext`r$13865$$, 0]}, 
+      "OtherVariables" :> {
+       Typeset`show$$, Typeset`bookmarkList$$, Typeset`bookmarkMode$$, 
+        Typeset`animator$$, Typeset`animvar$$, Typeset`name$$, 
+        Typeset`specs$$, Typeset`size$$, Typeset`update$$, Typeset`initDone$$,
+         Typeset`skipInitDone$$}, "Body" :> Plot[
+        Evaluate[
+         ReplaceAll[$CellContext`funcs, {$CellContext`ka -> \
+$CellContext`kk$$, $CellContext`ratio -> $CellContext`r$$, $CellContext`a0 -> 
+           1}]], {$CellContext`t, 0, 10}, PlotRange -> All, Frame -> True, 
+        PlotStyle -> {Red, Brown, Purple}, Epilog -> {Red, 
+          Text[
+           Row[{"[", 
+             Style["A", Italic], "]"}], {9, 0.9}], Brown, 
+          Text[
+           Row[{"[", 
+             Style["B", Italic], "]"}], {9, 0.8}], Purple, 
+          Text[
+           Row[{"[", 
+             Style["C", Italic], "]"}], {9, 0.7}], Black, 
+          With[{$CellContext`k$ = $CellContext`k}, 
+           Text[
+            TraditionalForm[
+             
+             Row[{Subscript[$CellContext`k$, $CellContext`a]/
+               Subscript[$CellContext`k$, $CellContext`b], " = ", 
+               NumberForm[$CellContext`r$$, {5, 1}]}]], {9, 0.5}]]}, 
+        ImageSize -> {500, 350}], 
+      "Specifications" :> {{{$CellContext`kk$$, 1, 
+          Subscript["k", "a"]}, 0.1, 10, Appearance -> 
+         "Labeled"}, {{$CellContext`r$$, 7.12, Subscript["k", "a"]/Subscript[
+          "k", "b"]}, 0.01, 10, Appearance -> "Labeled"}}, "Options" :> {}, 
+      "DefaultOptions" :> {ControllerLinking -> True}],
+     SingleEvaluation->True],
+    Deinitialization:>None,
+    DynamicModuleValues:>{},
+    Initialization:>({$CellContext`funcs = {$CellContext`a0/
+         E^($CellContext`ka $CellContext`t), 
+         If[$CellContext`ratio == 
+          1, (($CellContext`a0 $CellContext`ka) $CellContext`t)/
+          E^($CellContext`ka $CellContext`t), (($CellContext`a0 (
+             E^((-$CellContext`ka) $CellContext`t) - 
+             E^(-(($CellContext`ka $CellContext`t)/$CellContext`ratio)))) \
+$CellContext`ratio)/(1 - $CellContext`ratio)], 
+         If[$CellContext`ratio == 
+          1, ($CellContext`a0 (-1 + 
+            E^($CellContext`ka $CellContext`t) - $CellContext`ka \
+$CellContext`t))/
+          E^($CellContext`ka $CellContext`t), ($CellContext`a0 (1 - 
+            E^((-$CellContext`ka) $CellContext`t) - $CellContext`ratio + \
+$CellContext`ratio/E^(($CellContext`ka $CellContext`t)/$CellContext`ratio)))/(
+          1 - $CellContext`ratio)]}, Attributes[PlotRange] = {ReadProtected}, 
+       Attributes[Subscript] = {NHoldRest}, 
+       Subscript[$CellContext`w, $CellContext`opt] = {1.7400464392730235`, 
+        17.519153111103467`}}; Typeset`initDone$$ = True),
+    SynchronousInitialization->True,
+    UnsavedVariables:>{Typeset`initDone$$},
+    UntrackedVariables:>{Typeset`size$$}], "Manipulate",
+   Deployed->True,
+   StripOnInput->False],
+  Manipulate`InterpretManipulate[1]]], "Output",
+ CellID->435689],
+
+Cell[BoxData[
+ TagBox[
+  StyleBox[
+   DynamicModuleBox[{$CellContext`kk$$ = 1, $CellContext`r$$ = 6.9, 
+    Typeset`show$$ = True, Typeset`bookmarkList$$ = {}, 
+    Typeset`bookmarkMode$$ = "Menu", Typeset`animator$$, Typeset`animvar$$ = 
+    1, Typeset`name$$ = "\"untitled\"", Typeset`specs$$ = {{{
+       Hold[$CellContext`kk$$], 1, 
+       Subscript["k", "a"]}, 0.1, 10}, {{
+       Hold[$CellContext`r$$], 6.9, Subscript["k", "a"]/Subscript["k", "b"]}, 
+      0.01, 10}}, Typeset`size$$ = Automatic, Typeset`update$$ = 0, 
+    Typeset`initDone$$, Typeset`skipInitDone$$ = 
+    False, $CellContext`kk$13920$$ = 0, $CellContext`r$13921$$ = 0}, 
+    DynamicBox[Manipulate`ManipulateBoxes[
+     1, StandardForm, 
+      "Variables" :> {$CellContext`kk$$ = 1, $CellContext`r$$ = 6.9}, 
+      "ControllerVariables" :> {
+        Hold[$CellContext`kk$$, $CellContext`kk$13920$$, 0], 
+        Hold[$CellContext`r$$, $CellContext`r$13921$$, 0]}, 
+      "OtherVariables" :> {
+       Typeset`show$$, Typeset`bookmarkList$$, Typeset`bookmarkMode$$, 
+        Typeset`animator$$, Typeset`animvar$$, Typeset`name$$, 
+        Typeset`specs$$, Typeset`size$$, Typeset`update$$, Typeset`initDone$$,
+         Typeset`skipInitDone$$}, "Body" :> Plot[
+        Evaluate[
+         ReplaceAll[$CellContext`funcs, {$CellContext`ka -> \
+$CellContext`kk$$, $CellContext`ratio -> $CellContext`r$$, $CellContext`a0 -> 
+           1}]], {$CellContext`t, 0, 10}, PlotRange -> All, Frame -> True, 
+        PlotStyle -> {Red, Brown, Purple}, Epilog -> {Red, 
+          Text[
+           Row[{"[", 
+             Style["A", Italic], "]"}], {9, 0.9}], Brown, 
+          Text[
+           Row[{"[", 
+             Style["B", Italic], "]"}], {9, 0.8}], Purple, 
+          Text[
+           Row[{"[", 
+             Style["C", Italic], "]"}], {9, 0.7}], Black, 
+          With[{$CellContext`k$ = $CellContext`k}, 
+           Text[
+            TraditionalForm[
+             
+             Row[{Subscript[$CellContext`k$, $CellContext`a]/
+               Subscript[$CellContext`k$, $CellContext`b], " = ", 
+               NumberForm[$CellContext`r$$, {5, 1}]}]], {9, 0.5}]]}, 
+        ImageSize -> {500, 350}], 
+      "Specifications" :> {{{$CellContext`kk$$, 1, 
+          Subscript["k", "a"]}, 0.1, 10, Appearance -> 
+         "Labeled"}, {{$CellContext`r$$, 6.9, Subscript["k", "a"]/Subscript[
+          "k", "b"]}, 0.01, 10, Appearance -> "Labeled"}}, "Options" :> {}, 
+      "DefaultOptions" :> {ControllerLinking -> True}],
+     SingleEvaluation->True],
+    Deinitialization:>None,
+    DynamicModuleValues:>{},
+    Initialization:>({$CellContext`funcs = {$CellContext`a0/
+         E^($CellContext`ka $CellContext`t), 
+         If[$CellContext`ratio == 
+          1, (($CellContext`a0 $CellContext`ka) $CellContext`t)/
+          E^($CellContext`ka $CellContext`t), (($CellContext`a0 (
+             E^((-$CellContext`ka) $CellContext`t) - 
+             E^(-(($CellContext`ka $CellContext`t)/$CellContext`ratio)))) \
+$CellContext`ratio)/(1 - $CellContext`ratio)], 
+         If[$CellContext`ratio == 
+          1, ($CellContext`a0 (-1 + 
+            E^($CellContext`ka $CellContext`t) - $CellContext`ka \
+$CellContext`t))/
+          E^($CellContext`ka $CellContext`t), ($CellContext`a0 (1 - 
+            E^((-$CellContext`ka) $CellContext`t) - $CellContext`ratio + \
+$CellContext`ratio/E^(($CellContext`ka $CellContext`t)/$CellContext`ratio)))/(
+          1 - $CellContext`ratio)]}, Attributes[PlotRange] = {ReadProtected}, 
+       Attributes[Subscript] = {NHoldRest}, 
+       Subscript[$CellContext`w, $CellContext`opt] = {1.7400464392730235`, 
+        17.519153111103467`}}; Typeset`initDone$$ = True),
+    SynchronousInitialization->True,
+    UnsavedVariables:>{Typeset`initDone$$},
+    UntrackedVariables:>{Typeset`size$$}], "Manipulate",
+   Deployed->True,
+   StripOnInput->False],
+  Manipulate`InterpretManipulate[1]]], "Output",
+ CellID->925380390]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["", "DetailsSection"],
+
+Cell["Here are the solutions of the differential equations:", "DetailNotes",
+ CellChangeTimes->{
+  3.35696210375764*^9, {3.400298806796875*^9, 3.40029882821875*^9}, {
+   3.4003635679897547`*^9, 3.4003635710678797`*^9}},
+ CellID->34839484],
+
+Cell[TextData[Cell[BoxData[
+ FormBox[
+  RowBox[{
+   RowBox[{"a", "(", "t", ")"}], "=", 
+   RowBox[{
+    SubscriptBox["a", "0"], " ", 
+    SuperscriptBox["\[ExponentialE]", 
+     RowBox[{
+      RowBox[{"-", 
+       SubscriptBox["k", "a"]}], " ", "t"}]]}]}], 
+  TraditionalForm]], "InlineMath"]], "DetailNotes",
+ CellChangeTimes->{
+  3.35696210375764*^9, {3.40029888278125*^9, 3.40029888421875*^9}, {
+   3.400299137328125*^9, 3.400299138640625*^9}, {3.400324783714772*^9, 
+   3.400324785277272*^9}, 3.4003248294178967`*^9, {3.4003248627616467`*^9, 
+   3.4003248748241467`*^9}, {3.4003249514491467`*^9, 3.400324952746022*^9}},
+ CellID->356426049],
+
+Cell[TextData[Cell[BoxData[
+ FormBox[
+  RowBox[{
+   RowBox[{"b", "(", "t", ")"}], "=", 
+   FractionBox[
+    RowBox[{
+     SubscriptBox["a", "0"], "  ", 
+     SubscriptBox["k", "a"], "  ", 
+     RowBox[{"(", 
+      RowBox[{
+       SuperscriptBox["\[ExponentialE]", 
+        RowBox[{
+         RowBox[{"-", 
+          SubscriptBox["k", "a"]}], " ", "t"}]], "-", 
+       SuperscriptBox["\[ExponentialE]", 
+        RowBox[{
+         RowBox[{"-", 
+          SubscriptBox["k", "b"]}], " ", "t"}]]}], ")"}]}], 
+    RowBox[{
+     SubscriptBox["k", "b"], "-", 
+     SubscriptBox["k", "a"]}]]}], 
+  TraditionalForm]], "InlineMath"]], "DetailNotes",
+ CellChangeTimes->{
+  3.35696210375764*^9, {3.40029888771875*^9, 3.40029891009375*^9}, {
+   3.40029914153125*^9, 3.40029914434375*^9}, {3.400299693234375*^9, 
+   3.400299701359375*^9}, {3.4002997445625*^9, 3.40029983190625*^9}, {
+   3.400324790183522*^9, 3.4003247916053967`*^9}, 3.4003248303866467`*^9, {
+   3.4003248841366467`*^9, 3.4003249583866467`*^9}},
+ CellID->170420450],
+
+Cell[TextData[Cell[BoxData[
+ FormBox[
+  RowBox[{
+   RowBox[{"c", "(", "t", ")"}], "=", 
+   RowBox[{
+    SubscriptBox["a", "0"], " ", 
+    FractionBox[
+     RowBox[{" ", 
+      RowBox[{
+       RowBox[{
+        SubscriptBox["k", "a"], "(", 
+        RowBox[{
+         SuperscriptBox["\[ExponentialE]", 
+          RowBox[{
+           RowBox[{"-", 
+            SubscriptBox["k", "b"]}], " ", "t"}]], " ", "-", " ", "1"}], 
+        ")"}], "-", 
+       RowBox[{
+        SubscriptBox["k", "b"], " ", 
+        RowBox[{"(", 
+         RowBox[{
+          SuperscriptBox["\[ExponentialE]", 
+           RowBox[{
+            RowBox[{"-", 
+             SubscriptBox["k", "a"]}], " ", "t"}]], " ", "-", "1"}], 
+         ")"}]}]}]}], 
+     RowBox[{
+      SubscriptBox["k", "b"], "-", 
+      SubscriptBox["k", "a"]}]]}]}], 
+  TraditionalForm]], "InlineMath"]], "DetailNotes",
+ CellChangeTimes->{
+  3.35696210375764*^9, {3.40029888278125*^9, 3.40029888421875*^9}, {
+   3.400299137328125*^9, 3.400299138640625*^9}, 3.4003018720557594`*^9, {
+   3.4003247950428967`*^9, 3.4003247964491467`*^9}, 3.4003248311053967`*^9, {
+   3.400324890027272*^9, 3.4003249599803967`*^9}},
+ CellID->342711315],
+
+Cell[TextData[{
+ "The special case ",
+ Cell[BoxData[
+  FormBox[
+   RowBox[{
+    SubscriptBox["a", "0"], "=", " ", 
+    SubscriptBox["b", "0"]}], TraditionalForm]], "InlineMath"],
+ ":"
+}], "DetailNotes",
+ CellChangeTimes->{
+  3.35696210375764*^9, {3.400298957515625*^9, 3.40029898784375*^9}, {
+   3.400324800464772*^9, 3.400324800714772*^9}, {3.4003635779116297`*^9, 
+   3.4003635863178797`*^9}},
+ CellID->550953663],
+
+Cell[TextData[Cell[BoxData[
+ FormBox[
+  RowBox[{
+   RowBox[{"b", "(", "t", ")"}], "=", 
+   RowBox[{
+    SubscriptBox["a", "0"], " ", 
+    SuperscriptBox["\[ExponentialE]", 
+     RowBox[{
+      RowBox[{"-", 
+       SubscriptBox["k", "a"]}], " ", "t"}]], " ", 
+    SubscriptBox["k", "a"], " ", "t"}]}], 
+  TraditionalForm]], "InlineMath"]], "DetailNotes",
+ CellChangeTimes->{
+  3.35696210375764*^9, 3.400298992734375*^9, {3.40029911321875*^9, 
+   3.400299132203125*^9}, {3.4002991859375*^9, 3.40029919221875*^9}, {
+   3.400299539953125*^9, 3.400299543015625*^9}, {3.400324804589772*^9, 
+   3.4003248318553967`*^9}, {3.400324896527272*^9, 3.400324898089772*^9}, 
+   3.4003249615116467`*^9},
+ CellID->54277208],
+
+Cell[TextData[Cell[BoxData[
+ FormBox[
+  RowBox[{
+   RowBox[{"c", "(", "t", ")"}], "=", 
+   RowBox[{
+    SubscriptBox["a", "0"], " ", 
+    RowBox[{"(", 
+     RowBox[{"1", "-", " ", 
+      RowBox[{
+       SuperscriptBox["\[ExponentialE]", 
+        RowBox[{
+         RowBox[{"-", 
+          SubscriptBox["k", "a"]}], " ", "t"}]], "(", 
+       RowBox[{"1", "+", 
+        RowBox[{
+         SubscriptBox["k", "a"], " ", "t"}]}], ")"}]}], ")"}]}]}], 
+  TraditionalForm]], "InlineMath"]], "DetailNotes",
+ CellChangeTimes->{
+  3.35696210375764*^9, 3.400298992734375*^9, {3.40029911321875*^9, 
+   3.400299132203125*^9}, {3.4002991859375*^9, 3.40029919221875*^9}, {
+   3.400299539953125*^9, 3.400299543015625*^9}, 3.400301907601952*^9, {
+   3.4003248108866467`*^9, 3.4003248324803967`*^9}, {3.4003249000116467`*^9, 
+   3.4003249236991467`*^9}, 3.400324962558522*^9},
+ CellID->37335308]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["", "ControlSuggestionsSection",
+ CellID->337427261],
+
+Cell[BoxData[
+ TooltipBox[
+  RowBox[{
+   CheckboxBox[True], Cell[" Resize Images"]}],
+  "\"Click inside an image to reveal its orange resize frame.\\nDrag any of \
+the orange resize handles to resize the image.\"",
+  ActionDelay->0.35]], "ControlSuggestions",
+ CellChangeTimes->{3.35696210375764*^9, 3.4003251117303967`*^9},
+ FontFamily->"Verdana",
+ CellTags->"ResizeImages",
+ CellID->946243541],
+
+Cell[BoxData[
+ TooltipBox[
+  RowBox[{
+   CheckboxBox[False], Cell[" Rotate and Zoom in 3D"]}],
+  RowBox[{
+   "\"Drag a 3D graphic to rotate it. Starting the drag near the center \
+tumbles\\nthe graphic; starting near a corner turns it parallel to the plane \
+of the screen.\\nHold down \"", 
+    FrameBox[
+    "Ctrl", Background -> GrayLevel[0.9], FrameMargins -> 2, FrameStyle -> 
+     GrayLevel[0.9]], "\" (or \"", 
+    FrameBox[
+    "Cmd", Background -> GrayLevel[0.9], FrameMargins -> 2, FrameStyle -> 
+     GrayLevel[0.9]], "\" on Mac) and drag up and down to zoom.\""}],
+  ActionDelay->0.35]], "ControlSuggestions",
+ FontFamily->"Verdana",
+ CellTags->"RotateAndZoomIn3D",
+ CellID->77579361],
+
+Cell[BoxData[
+ TooltipBox[
+  RowBox[{
+   CheckboxBox[False], Cell[" Drag Locators"]}],
+  RowBox[{"\"Drag any locator (\"", 
+    GraphicsBox[
+     LocatorBox[
+      Scaled[{0.5, 0.5}]], ImageSize -> 20], 
+    "\", etc.) to move it around.\""}],
+  ActionDelay->0.35]], "ControlSuggestions",
+ FontFamily->"Verdana",
+ CellTags->"DragLocators",
+ CellID->542959696],
+
+Cell[BoxData[
+ TooltipBox[
+  RowBox[{
+   CheckboxBox[False], Cell[" Create and Delete Locators"]}],
+  RowBox[{"\"Insert a new locator in the graphic by holding down the \"", 
+    FrameBox[
+    "Alt", Background -> GrayLevel[0.9], FrameMargins -> 2, FrameStyle -> 
+     GrayLevel[0.9]], 
+    "\" key\\nand clicking where you want it to be. Delete a locator by \
+clicking it\\nwhile holding down the \"", 
+    FrameBox[
+    "Alt", Background -> GrayLevel[0.9], FrameMargins -> 2, FrameStyle -> 
+     GrayLevel[0.9]], "\" key.\""}],
+  ActionDelay->0.35]], "ControlSuggestions",
+ FontFamily->"Verdana",
+ CellTags->"CreateAndDeleteLocators",
+ CellID->96185701],
+
+Cell[BoxData[
+ TooltipBox[
+  RowBox[{
+   CheckboxBox[False], Cell[" Slider Zoom"]}],
+  RowBox[{"\"Hold down the \"", 
+    FrameBox[
+    "Alt", Background -> GrayLevel[0.9], FrameMargins -> 2, FrameStyle -> 
+     GrayLevel[0.9]], 
+    "\" key while moving a slider to make fine adjustments in the slider \
+value.\\nHold \"", 
+    FrameBox[
+    "Ctrl", Background -> GrayLevel[0.9], FrameMargins -> 2, FrameStyle -> 
+     GrayLevel[0.9]], "\" and/or \"", 
+    FrameBox[
+    "Shift", Background -> GrayLevel[0.9], FrameMargins -> 2, FrameStyle -> 
+     GrayLevel[0.9]], "\" at the same time as \"", 
+    FrameBox[
+    "Alt", Background -> GrayLevel[0.9], FrameMargins -> 2, FrameStyle -> 
+     GrayLevel[0.9]], "\" to make ever finer adjustments.\""}],
+  ActionDelay->0.35]], "ControlSuggestions",
+ FontFamily->"Verdana",
+ CellTags->"SliderZoom",
+ CellID->887125276],
+
+Cell[BoxData[
+ TooltipBox[
+  RowBox[{
+   CheckboxBox[False], Cell[" Gamepad Controls"]}],
+  "\"Control this Demonstration with a gamepad or other\\nhuman interface \
+device connected to your computer.\"",
+  ActionDelay->0.35]], "ControlSuggestions",
+ CellChangeTimes->{3.35696210375764*^9, 3.3895522232313623`*^9},
+ FontFamily->"Verdana",
+ CellTags->"GamepadControls",
+ CellID->521639558],
+
+Cell[BoxData[
+ TooltipBox[
+  RowBox[{
+   CheckboxBox[False], Cell[" Automatic Animation"]}],
+  RowBox[{"\"Animate a slider in this Demonstration by clicking the\"", 
+    AdjustmentBox[
+     Cell[
+      GraphicsData[
+      "CompressedBitmap", 
+       "eJzzTSzJSM1NLMlMTlRwL0osyMhMLlZwyy8CCjEzMjAwcIKwAgOI/R/IhBKc\n\
+/4EAyGAG0f+nTZsGwgysIJIRKsWKLAXGIHFmEpUgLADxWUAkI24jZs+eTaEt\n\
+IG+wQKRmzJgBlYf5lhEA30OqWA=="], "Graphics", ImageSize -> {9, 9}, ImageMargins -> 
+      0], BoxBaselineShift -> 0.1839080459770115, 
+     BoxMargins -> {{0., 0.}, {-0.1839080459770115, 0.1839080459770115}}], 
+    "\"button\\nnext to the slider, and then clicking the play button that \
+appears.\\nAnimate all controls by selecting \"", 
+    StyleBox["Autorun", FontWeight -> "Bold"], "\" from the\"", 
+    AdjustmentBox[
+     Cell[
+      GraphicsData[
+      "CompressedBitmap", 
+       "eJyNULENwyAQfEySIlMwTVJlCGRFsosokeNtqBmDBagoaZjAI1C8/8GUUUC6\n\
+57h7cQ8PvU7Pl17nUav7oj/TPH7V7b2QJAUAXBkKmCPRowxICy64bRvGGNF7\n\
+X8CctGoDSN4xhIDGGDhzFXwUh3/ClBKrDQPmnGXtI6u0OOd+tZBVUqy1xSaH\n\
+UqiK6pPe4XdEdAz6563tx/gejuORGMxJaz8mdpJn7hc="], "Graphics", 
+      ImageSize -> {10, 10}, ImageMargins -> 0], BoxBaselineShift -> 
+     0.1839080459770115, 
+     BoxMargins -> {{0., 0.}, {-0.1839080459770115, 0.1839080459770115}}], 
+    "\"menu.\""}],
+  ActionDelay->0.35]], "ControlSuggestions",
+ FontFamily->"Verdana",
+ CellTags->"AutomaticAnimation",
+ CellID->356111735],
+
+Cell[BoxData[
+ TooltipBox[
+  RowBox[{
+   CheckboxBox[False], Cell[" Bookmark Animation"]}],
+  RowBox[{
+   "\"See a prepared animation of this Demonstration by selecting\\n\"", 
+    StyleBox["Animate Bookmarks", FontWeight -> "Bold"], "\" from the\"", 
+    AdjustmentBox[
+     Cell[
+      GraphicsData[
+      "CompressedBitmap", 
+       "eJyNULENwyAQfEySIlMwTVJlCGRFsosokeNtqBmDBagoaZjAI1C8/8GUUUC6\n\
+57h7cQ8PvU7Pl17nUav7oj/TPH7V7b2QJAUAXBkKmCPRowxICy64bRvGGNF7\n\
+X8CctGoDSN4xhIDGGDhzFXwUh3/ClBKrDQPmnGXtI6u0OOd+tZBVUqy1xSaH\n\
+UqiK6pPe4XdEdAz6563tx/gejuORGMxJaz8mdpJn7hc="], "Graphics", 
+      ImageSize -> {10, 10}, ImageMargins -> 0], BoxBaselineShift -> 
+     0.1839080459770115, 
+     BoxMargins -> {{0., 0.}, {-0.1839080459770115, 0.1839080459770115}}], 
+    "\"menu.\""}],
+  ActionDelay->0.35]], "ControlSuggestions",
+ FontFamily->"Verdana",
+ CellTags->"BookmarkAnimation",
+ CellID->230363]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["", "SearchTermsSection"],
+
+Cell["chemistry", "SearchTerms",
+ CellChangeTimes->{
+  3.35696210375764*^9, {3.400299269421875*^9, 3.400299275609375*^9}},
+ CellID->6165723],
+
+Cell["reaction rates", "SearchTerms",
+ CellChangeTimes->{
+  3.35696210375764*^9, {3.40023677353125*^9, 3.40023677628125*^9}, {
+   3.400299278734375*^9, 3.400299281359375*^9}},
+ CellID->507057599],
+
+Cell["consecutive reactions", "SearchTerms",
+ CellChangeTimes->{
+  3.35696210375764*^9, {3.4003005566875*^9, 3.40030056240625*^9}},
+ CellID->746532981]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["", "RelatedLinksSection"],
+
+Cell[TextData[ButtonBox["Exponential Decay",
+ BaseStyle->"Hyperlink",
+ ButtonData->{
+   URL["http://mathworld.wolfram.com/ExponentialDecay.html"], 
+   None}]], "RelatedLinks",
+ CellChangeTimes->{
+  3.35696210375764*^9, {3.400584616094612*^9, 3.400584623953987*^9}},
+ CellID->101426830]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["", "AuthorSection"],
+
+Cell[TextData[{
+ "Contributed by: ",
+ ButtonBox["Gerhard Schwaab",
+  BaseStyle->"Hyperlink",
+  ButtonData->{
+    URL["http://demonstrations.wolfram.com/author.html?author=Gerhard+\
+Schwaab"], None},
+  ButtonNote->
+   "http://demonstrations.wolfram.com/author.html?author=Gerhard+Schwaab"],
+ " and ",
+ ButtonBox["Chantal Lorbeer",
+  BaseStyle->"Hyperlink",
+  ButtonData->{
+    URL["http://demonstrations.wolfram.com/author.html?author=Chantal+\
+Lorbeer"], None}],
+ " (Ruhr University Bochum)"
+}], "Author",
+ CellChangeTimes->{
+  3.35696210375764*^9, {3.4003250108241467`*^9, 3.4003250859178967`*^9}},
+ CellID->430562865]
+}, Open  ]]
+}, Open  ]]
+},
+WindowSize->{700, Automatic},
+WindowMargins->{{Automatic, 260}, {Automatic, 1}},
+FrontEndVersion->"6.0 for Microsoft Windows (64-bit) (May 21, 2008)",
+StyleDefinitions->FrontEnd`FileName[{"Wolfram"}, "Demonstration.nb", 
+  CharacterEncoding -> "WindowsANSI"]
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{
+ "ResizeImages"->{
+  Cell[37002, 923, 395, 10, 22, "ControlSuggestions",
+   CellTags->"ResizeImages",
+   CellID->946243541]},
+ "RotateAndZoomIn3D"->{
+  Cell[37400, 935, 696, 17, 22, "ControlSuggestions",
+   CellTags->"RotateAndZoomIn3D",
+   CellID->77579361]},
+ "DragLocators"->{
+  Cell[38099, 954, 359, 12, 22, "ControlSuggestions",
+   CellTags->"DragLocators",
+   CellID->542959696]},
+ "CreateAndDeleteLocators"->{
+  Cell[38461, 968, 655, 16, 22, "ControlSuggestions",
+   CellTags->"CreateAndDeleteLocators",
+   CellID->96185701]},
+ "SliderZoom"->{
+  Cell[39119, 986, 863, 22, 22, "ControlSuggestions",
+   CellTags->"SliderZoom",
+   CellID->887125276]},
+ "GamepadControls"->{
+  Cell[39985, 1010, 388, 10, 22, "ControlSuggestions",
+   CellTags->"GamepadControls",
+   CellID->521639558]},
+ "AutomaticAnimation"->{
+  Cell[40376, 1022, 1431, 32, 22, "ControlSuggestions",
+   CellTags->"AutomaticAnimation",
+   CellID->356111735]},
+ "BookmarkAnimation"->{
+  Cell[41810, 1056, 898, 22, 22, "ControlSuggestions",
+   CellTags->"BookmarkAnimation",
+   CellID->230363]}
+ }
+*)
+(*CellTagsIndex
+CellTagsIndex->{
+ {"ResizeImages", 44715, 1154},
+ {"RotateAndZoomIn3D", 44846, 1158},
+ {"DragLocators", 44976, 1162},
+ {"CreateAndDeleteLocators", 45113, 1166},
+ {"SliderZoom", 45247, 1170},
+ {"GamepadControls", 45374, 1174},
+ {"AutomaticAnimation", 45510, 1178},
+ {"BookmarkAnimation", 45649, 1182}
+ }
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[CellGroupData[{
+Cell[590, 23, 189, 3, 74, "DemoTitle"],
+Cell[CellGroupData[{
+Cell[804, 30, 33, 0, 156, "InitializationSection"],
+Cell[840, 32, 159, 4, 41, "Input",
+ CellID->606310703],
+Cell[1002, 38, 2137, 60, 261, "Input",
+ CellID->594894746]
+}, Closed]],
+Cell[CellGroupData[{
+Cell[3176, 103, 29, 0, 188, "ManipulateSection"],
+Cell[CellGroupData[{
+Cell[3230, 107, 4331, 109, 306, "Input"],
+Cell[7564, 218, 3955, 80, 481, "Output",
+ CellID->5701058]
+}, {2}]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[11565, 304, 36, 0, 136, "ManipulateCaptionSection"],
+Cell[11604, 306, 1569, 44, 75, "ManipulateCaption",
+ CellID->159325440],
+Cell[13176, 352, 674, 19, 23, "ManipulateCaption",
+ CellID->129851514],
+Cell[13853, 373, 791, 20, 23, "ManipulateCaption",
+ CellID->63773798],
+Cell[14647, 395, 732, 17, 23, "ManipulateCaption",
+ CellID->215698967],
+Cell[15382, 414, 554, 10, 22, "ManipulateCaption",
+ CellID->201600998]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[15973, 429, 28, 0, 168, "ThumbnailSection"],
+Cell[16004, 431, 3957, 80, 481, "Output",
+ CellID->368597233]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[19998, 516, 28, 0, 138, "SnapshotsSection"],
+Cell[20029, 518, 3903, 79, 32, "Output",
+ CellID->454225291],
+Cell[23935, 599, 3912, 79, 32, "Output",
+ CellID->435689],
+Cell[27850, 680, 3911, 79, 32, "Output",
+ CellID->925380390]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[31798, 764, 26, 0, 232, "DetailsSection"],
+Cell[31827, 766, 238, 4, 22, "DetailNotes",
+ CellID->34839484],
+Cell[32068, 772, 643, 16, 23, "DetailNotes",
+ CellID->356426049],
+Cell[32714, 790, 1016, 28, 43, "DetailNotes",
+ CellID->170420450],
+Cell[33733, 820, 1168, 35, 43, "DetailNotes",
+ CellID->342711315],
+Cell[34904, 857, 415, 13, 23, "DetailNotes",
+ CellID->550953663],
+Cell[35322, 872, 706, 18, 23, "DetailNotes",
+ CellID->54277208],
+Cell[36031, 892, 874, 23, 26, "DetailNotes",
+ CellID->37335308]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[36942, 920, 57, 1, 120, "ControlSuggestionsSection",
+ CellID->337427261],
+Cell[37002, 923, 395, 10, 22, "ControlSuggestions",
+ CellTags->"ResizeImages",
+ CellID->946243541],
+Cell[37400, 935, 696, 17, 22, "ControlSuggestions",
+ CellTags->"RotateAndZoomIn3D",
+ CellID->77579361],
+Cell[38099, 954, 359, 12, 22, "ControlSuggestions",
+ CellTags->"DragLocators",
+ CellID->542959696],
+Cell[38461, 968, 655, 16, 22, "ControlSuggestions",
+ CellTags->"CreateAndDeleteLocators",
+ CellID->96185701],
+Cell[39119, 986, 863, 22, 22, "ControlSuggestions",
+ CellTags->"SliderZoom",
+ CellID->887125276],
+Cell[39985, 1010, 388, 10, 22, "ControlSuggestions",
+ CellTags->"GamepadControls",
+ CellID->521639558],
+Cell[40376, 1022, 1431, 32, 22, "ControlSuggestions",
+ CellTags->"AutomaticAnimation",
+ CellID->356111735],
+Cell[41810, 1056, 898, 22, 22, "ControlSuggestions",
+ CellTags->"BookmarkAnimation",
+ CellID->230363]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[42745, 1083, 30, 0, 152, "SearchTermsSection"],
+Cell[42778, 1085, 140, 3, 22, "SearchTerms",
+ CellID->6165723],
+Cell[42921, 1090, 195, 4, 22, "SearchTerms",
+ CellID->507057599],
+Cell[43119, 1096, 151, 3, 22, "SearchTerms",
+ CellID->746532981]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[43307, 1104, 31, 0, 138, "RelatedLinksSection"],
+Cell[43341, 1106, 285, 7, 22, "RelatedLinks",
+ CellID->101426830]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[43663, 1118, 25, 0, 136, "AuthorSection"],
+Cell[43691, 1120, 619, 19, 22, "Author",
+ CellID->430562865]
+}, Open  ]]
+}, Open  ]]
+}
+]
+*)
+
+(* End of internal cache information *)

@@ -43,6 +43,12 @@ make: *** [kernel] Error 2
 将kernel/timeconst.pl中第373行的defined()去掉只留下@val就可以了
 ```
 
+##dropbear ssh
+https://wiki.beyondlogic.org/index.php?title=Cross_Compiling_BusyBox_for_ARM
+https://blog.csdn.net/code_style/article/details/61928328
+http://wiki.andreas-duffner.de/index.php/Ssh,_error:_openpty:_No_such_file_or_directory
+
+
 ## 文件系统
 ### build busybox
 make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- menuconfig
@@ -211,7 +217,6 @@ make && make install
 ```
 
 ### 不支持openGL的Qt编译
-目前SGX未移植成功，不支持openGL
 
 ```shell
 #修改qt-everywhere-opensource-src-5.6.3/qtbase/mkspace/linux-arm-guneabi-g++/qmake.conf如下
@@ -271,7 +276,7 @@ load(qt_config)
 
 ```
 
-#qt 5.7
+### Qt 5.7
 参考[TI wiki](http://processors.wiki.ti.com/index.php/Building_Qt_with_OpenGL_ES_accelerated_by_SGX#Building_Qt_with_OpenGL_ES)
 
 ```shell
@@ -314,6 +319,13 @@ $ g++ --version
 
 ```
 
+制作UBI文件系统
+```shell
+#使用飞凌提供的mkfs和ubinize，使用ubuntu安装版本有问题
+./mkfs.ubifs -F -r rootfs -m 2048 -e 126976 -c 1866 -o ubifs.img
+./ubinize -o ubi.img -m 2048 -p 128KiB -s 2048 -O 2048 ubinize-256M.cfg
+```
+
 tslib配置https://doc.qt.io/qt-5/embedded-linux.html#eglfs
 
 运行环境配置
@@ -338,7 +350,6 @@ export TSLIB_FBDEVICE=/dev/fb0
 export TSLIB_TSDEVICE=/dev/input/event0
 export TSLIB_TSEVENTTYPE=INPUT
 
-
 export QT_QPA_PLATFORM=eglfs
 export QT_QPA_EGLFS_FB=/dev/fb0
 export QT_QPA_EGLFS_WIDTH=1024
@@ -346,6 +357,7 @@ export QT_QPA_EGLFS_HEIGHT=600
 export QT_QPA_EGLFS_PHYSICAL_WIDTH=154.08
 export QT_QPA_EGLFS_PHYSICAL_HEIGHT=85.92
 export QT_QPA_EGLFS_TSLIB=1
+#export QT_DEBUG_PLUGINS=1
 
 export QML2_IMPORT_PATH=$QT_DIR/qml
 export QT_QPA_FONTDIR=$QT_DIR/lib/fonts
@@ -353,7 +365,8 @@ export QT_QPA_PLATFORM_PLUGIN_PATH=$QT_DIR/plugins
 export QT_QPA_GENERIC_PLUGINS=tslib:$TSLIB_TSDEVICE
 ```
 
-```
+OK335x Nand分区信息
+```shell
 nandrootfstype=yaffs2 rootwait=1
 nandrootfstype=ubi rootwait=1
 
